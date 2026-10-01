@@ -14,7 +14,7 @@
     "test": "node --disable-warning=ExperimentalWarning --test tests/*.test.js",
     "test:e2e": "node --disable-warning=ExperimentalWarning tests/e2e/run.js",
     "backup": "node --disable-warning=ExperimentalWarning scripts/backup.js",
-    "build:netlify": "node --disable-warning=ExperimentalWarning scripts/build-netlify.js"
+    "build:netlify": "node scripts/build-netlify.js"
   },
   "devDependencies": {
     "axe-core": "^4.13.0",

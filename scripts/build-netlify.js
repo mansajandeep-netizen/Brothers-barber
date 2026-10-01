@@ -16,9 +16,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { config, ROOT_DIR } from '../server/config.js';
-import { openDatabase } from '../server/db.js';
-import { createStore } from '../server/repos/index.js';
 import { createStaticHandler, CSP } from '../server/http.js';
+import { DEFAULT_BUSINESS, DEFAULT_BOOKING, DEFAULT_HOURS, SEED_SERVICES, SEED_BARBERS } from '../server/seed-data.js';
 import { renderHome } from '../server/views/home.js';
 import { renderNotFound } from '../server/views/pages.js';
 import { zonedNow } from '../server/lib/time.js';
@@ -44,16 +43,15 @@ const siteUrl = (process.env.SITE_URL || process.env.URL || 'http://localhost:88
 
 fs.cpSync(config.publicDir, OUT, { recursive: true });
 
-const db = openDatabase(':memory:');
-const store = createStore(db);
+// Built straight from the default content (no database needed, so it runs on any Node version).
 const statics = createStaticHandler(config.publicDir);
 const site = {
-  business: store.settings.business(),
-  hours: store.hours.list(),
-  services: store.services.list({ activeOnly: true }),
-  barbers: store.barbers.list({ activeOnly: true }),
+  business: DEFAULT_BUSINESS,
+  hours: DEFAULT_HOURS.map((h) => ({ day: h.day, isOpen: true, open: h.open, close: h.close })),
+  services: SEED_SERVICES.map((s, i) => ({ ...s, id: i + 1, durationMin: null, priceCents: null, priceFrom: false, isActive: true, sortOrder: (i + 1) * 10 })),
+  barbers: SEED_BARBERS.map((name, i) => ({ id: i + 1, name, title: '', workDays: [0, 1, 2, 3, 4, 5, 6], isActive: true })),
   reviews: [],
-  booking: { ...store.settings.booking(), enabled: false },
+  booking: { ...DEFAULT_BOOKING, enabled: false },
   gallery: JSON.parse(fs.readFileSync(path.join(config.contentDir, 'gallery.json'), 'utf8')),
   siteUrl,
   timezone: config.timezone,
@@ -91,5 +89,4 @@ fs.writeFileSync(
   Cache-Control: public, max-age=86400
 `,
 );
-db.close();
 console.log(`Static preview built in dist/ for ${siteUrl}`);
