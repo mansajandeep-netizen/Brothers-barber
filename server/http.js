@@ -124,7 +124,7 @@ export function clientIp(req, trustProxy) {
 /* Responses                                                           */
 /* ------------------------------------------------------------------ */
 
-const CSP = [
+export const CSP = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",

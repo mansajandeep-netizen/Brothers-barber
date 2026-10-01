@@ -81,6 +81,7 @@ export function createApp({ config, store, scheduler, mailer, logger = console }
   registerAdminRoutes(router, deps);
   const pages = registerPageRoutes(router, deps);
 
+  const publicHost = new URL(config.siteUrl).host;
   function checkSameOrigin(req) {
     const site = req.headers['sec-fetch-site'];
     if (site && site !== 'same-origin' && site !== 'none') {
@@ -95,7 +96,7 @@ export function createApp({ config, store, scheduler, mailer, logger = console }
     } catch {
       originHost = '';
     }
-    if (originHost !== host) throw new HttpError(403, 'Cross-site requests are not allowed.');
+    if (originHost !== host && originHost !== publicHost) throw new HttpError(403, 'Cross-site requests are not allowed.');
   }
 
   return async function handle(req, res) {

@@ -119,7 +119,7 @@ function footer(site, { home }) {
   </div>
   <div class="container site-footer__bottom">
     <p>© ${site.year} ${b.name}. All rights reserved.</p>
-    <p><a href="/admin" rel="nofollow">Staff login</a></p>
+    ${site.preview ? '' : html`<p><a href="/admin" rel="nofollow">Staff login</a></p>`}
   </div>
 </footer>`;
 }

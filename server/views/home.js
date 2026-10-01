@@ -434,6 +434,7 @@ function clientData(site) {
     booking: {
       enabled: site.booking.enabled,
       maxAdvanceDays: site.booking.maxAdvanceDays,
+      preview: !!site.preview,
     },
     services: site.services.map((s) => ({
       id: s.id,

@@ -866,7 +866,7 @@ export function initBooking({ data: embedded }) {
   }
 
   function renderFatal(message) {
-    el.title.textContent = 'Book an appointment';
+    el.title.textContent = 'Book online';
     el.step.textContent = '';
     el.footer.hidden = true;
     el.back.hidden = true;
@@ -875,14 +875,16 @@ export function initBooking({ data: embedded }) {
   }
 
   function renderPaused() {
-    el.title.textContent = 'Book an appointment';
+    el.title.textContent = 'Book online';
     el.step.textContent = '';
     el.footer.hidden = true;
     el.back.hidden = true;
     el.body.innerHTML = `<div class="state">
       <span class="state__icon">${icon('phone')}</span>
-      <p class="state__title">Online booking is paused</p>
-      <p class="state__text">We’re not taking online bookings right now. Give us a call and we’ll get you in.</p>
+      <p class="state__title">${data?.booking?.preview ? 'Online booking is coming soon' : 'Online booking is paused'}</p>
+      <p class="state__text">${
+        data?.booking?.preview ? 'For now, give us a call and we’ll book you in.' : 'We’re not taking online bookings right now. Give us a call and we’ll get you in.'
+      }</p>
       <div class="state__actions">${callLink()}</div>
     </div>`;
   }

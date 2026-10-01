@@ -1,0 +1,10 @@
+# Netlify publishes the output of scripts/build-netlify.js.
+# Without BACKEND_URL: a static preview of the website (booking asks customers to call).
+# With BACKEND_URL (Site settings → Environment variables): Netlify forwards every
+# request to the Node server, so booking and the /admin dashboard work too.
+[build]
+  command = "npm run build:netlify"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"

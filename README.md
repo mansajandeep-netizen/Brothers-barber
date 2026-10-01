@@ -84,6 +84,13 @@ brothersbarbershop.ca {
 }
 ```
 
+### Netlify
+
+Netlify serves files only. It can't run the booking server or store bookings, so `netlify.toml` runs `npm run build:netlify` and publishes `dist/`:
+
+- **No `BACKEND_URL` set:** you get a static preview of the full website built from the default content. Book buttons tell customers online booking is coming soon and offer the phone number, and the dashboard isn't available.
+- **`BACKEND_URL` set:** set it under Netlify → Site configuration → Environment variables to the HTTPS address of the Node server running on Render, Railway, Fly.io or a VPS, then redeploy. Netlify then forwards every request to that server, so booking and `/admin` work on the Netlify address. On the Node server, set `SITE_URL` to the Netlify address and `TRUST_PROXY=true`.
+
 After launch, add the site URL to the shop's **Google Business Profile** (website and booking link `https://your-domain/book`) and submit `https://your-domain/sitemap.xml` in Google Search Console.
 
 ## Testing
