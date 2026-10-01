@@ -1,0 +1,133 @@
+[
+  {
+    "src": "/images/gallery/01-fades-640.webp",
+    "srcLarge": "/images/gallery/01-fades-1400.webp",
+    "width": 640,
+    "height": 853,
+    "category": "fades",
+    "alt": "Skin fade with a hand-cut design line",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/wE-GAKR9WaY"
+  },
+  {
+    "src": "/images/gallery/02-fades-640.webp",
+    "srcLarge": "/images/gallery/02-fades-1400.webp",
+    "width": 640,
+    "height": 960,
+    "category": "fades",
+    "alt": "Barber blending a clipper fade",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/YDOc9F6HUFA"
+  },
+  {
+    "src": "/images/gallery/03-fades-640.webp",
+    "srcLarge": "/images/gallery/03-fades-1400.webp",
+    "width": 640,
+    "height": 427,
+    "category": "fades",
+    "alt": "Trimmer detailing a high fade",
+    "feature": true,
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/Q82AM6BWBPM"
+  },
+  {
+    "src": "/images/gallery/04-haircuts-640.webp",
+    "srcLarge": "/images/gallery/04-haircuts-1400.webp",
+    "width": 640,
+    "height": 851,
+    "category": "haircuts",
+    "alt": "Barber shaping a textured curly top",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/-sRVfY0f2d8"
+  },
+  {
+    "src": "/images/gallery/05-haircuts-640.webp",
+    "srcLarge": "/images/gallery/05-haircuts-1400.webp",
+    "width": 640,
+    "height": 960,
+    "category": "haircuts",
+    "alt": "Thinning shears and comb working through a cut",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/DrG4V5skbMY"
+  },
+  {
+    "src": "/images/gallery/06-haircuts-640.webp",
+    "srcLarge": "/images/gallery/06-haircuts-1400.webp",
+    "width": 640,
+    "height": 800,
+    "category": "haircuts",
+    "alt": "Scissor-over-comb cut in progress",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/tgPrIYnW3g4"
+  },
+  {
+    "src": "/images/gallery/07-beard-640.webp",
+    "srcLarge": "/images/gallery/07-beard-1400.webp",
+    "width": 640,
+    "height": 960,
+    "category": "beard",
+    "alt": "Beard being shaped with scissors",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/4k60yfGy7fU"
+  },
+  {
+    "src": "/images/gallery/08-beard-640.webp",
+    "srcLarge": "/images/gallery/08-beard-1400.webp",
+    "width": 640,
+    "height": 964,
+    "category": "beard",
+    "alt": "Black and white beard trim with shears",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/fE42nRlBcG8"
+  },
+  {
+    "src": "/images/gallery/09-beard-640.webp",
+    "srcLarge": "/images/gallery/09-beard-1400.webp",
+    "width": 640,
+    "height": 960,
+    "category": "beard",
+    "alt": "Full beard with a sharp, faded line-up",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/S3GxGKyGPWM"
+  },
+  {
+    "src": "/images/gallery/10-shop-640.webp",
+    "srcLarge": "/images/gallery/10-shop-1400.webp",
+    "width": 640,
+    "height": 800,
+    "category": "shop",
+    "alt": "Classic chrome and leather barber chairs",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/dU6eE_j2My8"
+  },
+  {
+    "src": "/images/gallery/11-shop-640.webp",
+    "srcLarge": "/images/gallery/11-shop-1400.webp",
+    "width": 640,
+    "height": 960,
+    "category": "shop",
+    "alt": "Row of barber stations under pendant lights",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/2seUdPQNy_I"
+  },
+  {
+    "src": "/images/gallery/12-grooming-640.webp",
+    "srcLarge": "/images/gallery/12-grooming-1400.webp",
+    "width": 640,
+    "height": 427,
+    "category": "grooming",
+    "alt": "Lathering a beard before a traditional shave",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/Twd3yaqA2NM"
+  },
+  {
+    "src": "/images/gallery/13-grooming-640.webp",
+    "srcLarge": "/images/gallery/13-grooming-1400.webp",
+    "width": 640,
+    "height": 427,
+    "category": "grooming",
+    "alt": "Clippers, shears and grooming products laid out",
+    "placeholder": true,
+    "source": "https://unsplash.com/photos/MNu0n-3BIKs"
+  }
+]
