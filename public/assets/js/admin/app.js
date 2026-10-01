@@ -143,7 +143,7 @@ function renderShell() {
   const navItems = [];
   for (const r of ROUTES) {
     if (r.section) {
-      navItems.push(h('li', { class: 'nav__label', role: 'presentation' }, r.section));
+      navItems.push(h('li', { class: 'nav__label' }, r.section));
       continue;
     }
     if (r.hidden || (r.owner && !isOwner())) continue;

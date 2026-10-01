@@ -11,7 +11,7 @@
   --line-2: #d6cdbe;
   --text: #17150f;
   --text-2: #575147;
-  --text-3: #8a8377;
+  --text-3: #706a5f;
   --gold: #c9a46a;
   --gold-strong: #8a6630;
   --gold-bg: #f7efe0;
@@ -311,7 +311,7 @@ a {
 
 .nav__label {
   margin: 18px 12px 6px;
-  color: #6f6a62;
+  color: #8f8a80;
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -399,7 +399,7 @@ a {
 }
 
 .user-card__role {
-  color: #7d776d;
+  color: #9a948a;
   font-size: 12px;
   text-transform: capitalize;
 }
@@ -887,7 +887,7 @@ button.link {
 
 .badge--cancelled {
   background: #efece6;
-  color: #7a746a;
+  color: #625d55;
 }
 
 .badge--no_show {
