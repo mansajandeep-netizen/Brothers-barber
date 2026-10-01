@@ -103,6 +103,7 @@ async function bookingToTimes(page, { service, barber, date }) {
 }
 
 async function runAxe(page, label, { include = null } = {}) {
+  await page.waitForTimeout(700); // measure contrast after entrance animations settle
   await page.addScriptTag({ path: path.join(ROOT, 'node_modules/axe-core/axe.min.js') });
   const result = await page.evaluate(async (ctx) => {
     // eslint-disable-next-line no-undef
@@ -338,6 +339,32 @@ async function main() {
       await ctx.close();
     });
 
+    await check('loading skeletons and network errors are handled, with retry', async () => {
+      const ctx = await desktop();
+      const page = await ctx.newPage();
+      await page.goto(BASE);
+      // Calendar request fails once → error state with retry.
+      let failCalendar = true;
+      await page.route('**/api/availability/calendar**', (route) => (failCalendar ? route.abort() : route.continue()));
+      await page.locator('.service-card', { hasText: 'Buzz Cut' }).locator('[data-book]').click();
+      await page.locator('.option', { hasText: 'Any available barber' }).click();
+      await page.locator('.state', { hasText: 'Couldn’t load availability' }).waitFor();
+      assert(await page.locator('[data-retry]').isVisible(), 'retry button shown');
+      failCalendar = false;
+      await page.locator('[data-retry]').click();
+      await page.locator('.cal__day[data-date]:not([disabled])').first().waitFor();
+      // Slow time-slot request → skeleton placeholders while loading.
+      await page.route('**/api/availability/slots**', async (route) => {
+        await new Promise((r) => setTimeout(r, 1200));
+        await route.continue();
+      });
+      await page.locator('.cal__day[data-date]:not([disabled])').first().click();
+      await page.locator('.slot.skeleton').first().waitFor();
+      await page.locator('.slot[data-time]').first().waitFor();
+      assert(!(await page.locator('.slot.skeleton').count()), 'skeletons replaced by times');
+      await ctx.close();
+    });
+
     await check('mobile: menu, click-to-call, sticky Book Now, full-screen booking, back button closes it', async () => {
       const ctx = await mobile();
       const page = await ctx.newPage();
@@ -499,6 +526,7 @@ async function main() {
       await page.fill('input[name=password]', 'wrong-password-here');
       await page.click('button[type=submit]');
       await page.locator('.alert--danger', { hasText: 'don’t match' }).waitFor();
+      problems.length = 0; // the browser logs the expected 401 from the wrong password
       await page.fill('input[name=password]', ADMIN.password);
       await page.click('button[type=submit]');
       await page.locator('.stats').waitFor();
@@ -511,7 +539,7 @@ async function main() {
       await modalEl.locator('input[name=date]').fill(dateE);
       await modalEl.locator('input[name=date]').dispatchEvent('change');
       await modalEl.locator('.time-chip:not([disabled])').first().waitFor();
-      await modalEl.locator('.time-chip:not([disabled])', { hasText: '2 PM' }).click();
+      await modalEl.locator('.time-chip[data-time="14:00"]').click();
       await modalEl.locator('input[name=customerName]').fill('Morgan Walk-in');
       await modalEl.locator('input[name=customerPhone]').fill('780 555 0905');
       await modalEl.locator('.modal__foot .btn--primary').click();

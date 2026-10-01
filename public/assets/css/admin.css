@@ -2313,3 +2313,18 @@ button.link {
   grid-column: 2;
   align-self: center;
 }
+
+@media (max-width: 520px) {
+  .topbar > .btn--primary {
+    padding-inline: 10px;
+  }
+
+  .topbar > .btn--primary span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

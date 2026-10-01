@@ -12,7 +12,8 @@
     "dev": "node --disable-warning=ExperimentalWarning --watch server/index.js",
     "create-admin": "node --disable-warning=ExperimentalWarning scripts/create-admin.js",
     "test": "node --disable-warning=ExperimentalWarning --test tests/*.test.js",
-    "test:e2e": "node --disable-warning=ExperimentalWarning tests/e2e/run.js"
+    "test:e2e": "node --disable-warning=ExperimentalWarning tests/e2e/run.js",
+    "backup": "node --disable-warning=ExperimentalWarning scripts/backup.js"
   },
   "devDependencies": {
     "axe-core": "^4.13.0",
