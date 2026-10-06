@@ -20,7 +20,7 @@ function fold(line) {
 export function appointmentIcs(appt, business, { timezone, siteHost }) {
   const start = zonedToUtc(appt.date, appt.startMin, timezone);
   const end = zonedToUtc(appt.date, appt.endMin, timezone);
-  const address = `${business.streetAddress}, ${business.city}, ${business.region} ${business.postalCode}`;
+  const address = `${business.building ? `${business.building}, ` : ''}${business.streetAddress}, ${business.city}, ${business.region} ${business.postalCode}`;
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -38,7 +38,7 @@ export function appointmentIcs(appt, business, { timezone, siteHost }) {
     `STATUS:${appt.status === 'cancelled' ? 'CANCELLED' : 'CONFIRMED'}`,
     'BEGIN:VALARM',
     'ACTION:DISPLAY',
-    'DESCRIPTION:Barber appointment reminder',
+    'DESCRIPTION:Appointment reminder',
     'TRIGGER:-PT1H',
     'END:VALARM',
     'END:VEVENT',

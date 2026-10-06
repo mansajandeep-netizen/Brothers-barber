@@ -95,7 +95,7 @@ export function barbersRepo(db) {
       return this.get(Number(lastInsertRowid));
     },
     update(id, b) {
-      if (!this.getLive(id)) throw new HttpError(404, 'Barber not found.');
+      if (!this.getLive(id)) throw new HttpError(404, 'Stylist not found.');
       db.run(
         `UPDATE barbers SET name = ?, title = ?, work_days = ?, is_active = ?, sort_order = ?, updated_at = datetime('now')
          WHERE id = ?`,
@@ -104,7 +104,7 @@ export function barbersRepo(db) {
       return this.get(id);
     },
     remove(id, today) {
-      if (!this.getLive(id)) throw new HttpError(404, 'Barber not found.');
+      if (!this.getLive(id)) throw new HttpError(404, 'Stylist not found.');
       const upcoming = db.get(
         "SELECT COUNT(*) AS n FROM appointments WHERE barber_id = ? AND status = 'booked' AND date >= ?",
         [id, today],
@@ -112,7 +112,7 @@ export function barbersRepo(db) {
       if (upcoming > 0) {
         throw new HttpError(
           409,
-          `This barber has ${upcoming} upcoming appointment${upcoming === 1 ? '' : 's'}. Reassign or cancel them first.`,
+          `This stylist has ${upcoming} upcoming appointment${upcoming === 1 ? '' : 's'}. Reassign or cancel them first.`,
         );
       }
       db.run("UPDATE barbers SET is_deleted = 1, is_active = 0, updated_at = datetime('now') WHERE id = ?", [id]);

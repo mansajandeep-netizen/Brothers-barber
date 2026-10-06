@@ -30,7 +30,7 @@ server.headersTimeout = 66_000;
 server.requestTimeout = 30_000;
 
 server.listen(config.port, config.host, () => {
-  console.log(`Brothers Barber Shop running at ${config.siteUrl}  (admin: ${config.siteUrl}/admin)`);
+  console.log(`Manhandler website running at ${config.siteUrl}  (admin: ${config.siteUrl}/admin)`);
   console.log(`[mail] provider: ${mailer.provider}${mailer.canSend ? '' : ' — confirmation emails are logged, not sent'}`);
 });
 

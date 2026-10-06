@@ -9,7 +9,7 @@ const ROUTES = [
   { path: 'customers', title: 'Customers', icon: 'users', load: () => import('./views/customers.js') },
   { section: 'Shop setup' },
   { path: 'services', title: 'Services & Prices', icon: 'scissors', load: () => import('./views/services.js') },
-  { path: 'barbers', title: 'Barbers', icon: 'user', load: () => import('./views/barbers.js') },
+  { path: 'barbers', title: 'Stylists', icon: 'user', load: () => import('./views/barbers.js') },
   { path: 'availability', title: 'Hours & Availability', icon: 'clock', load: () => import('./views/availability.js') },
   { path: 'reviews', title: 'Reviews', icon: 'star', owner: true, load: () => import('./views/reviews.js') },
   { path: 'settings', title: 'Business Info', icon: 'store', owner: true, load: () => import('./views/settings.js') },
@@ -55,7 +55,7 @@ function renderFatal(err) {
 function renderLogin() {
   app.removeAttribute('aria-busy');
   app.className = '';
-  document.title = 'Sign in | Brothers Barber Shop';
+  document.title = 'Sign in | Manhandler';
   const submit = button('Sign in', { variant: 'primary', type: 'submit' });
   const form = h(
     'form',
@@ -242,7 +242,7 @@ async function route() {
     else a.removeAttribute('aria-current');
   }
   shell.title.textContent = def.title;
-  document.title = `${def.title} | Brothers Barber Shop`;
+  document.title = `${def.title} | Manhandler`;
   clear(shell.actions);
 
   if (def.owner && !isOwner()) {

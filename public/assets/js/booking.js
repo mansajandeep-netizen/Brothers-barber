@@ -1,12 +1,12 @@
 /**
- * Booking flow: Service → Barber → Date → Time → Details → Confirmation.
+ * Booking flow: Service → Stylist → Date → Time → Details → Confirmation.
  * Renders into the <dialog data-booking> shell that the server includes on every page.
  */
 import { $, $$, api, ApiError, esc, formatDate, formatDateLong, icon, prefersReducedMotion, wait } from './lib.js';
 
 const STEP_META = {
   service: { title: 'Choose a service' },
-  barber: { title: 'Choose a barber' },
+  barber: { title: 'Choose your stylist' },
   date: { title: 'Pick a date' },
   time: { title: 'Pick a time' },
   details: { title: 'Your details' },
@@ -76,7 +76,7 @@ export function initBooking({ data: embedded }) {
 
   const service = () => data?.services.find((s) => s.id === state.serviceId) ?? null;
   const barberName = () => {
-    if (state.barberId === null) return 'Any available barber';
+    if (state.barberId === null) return 'Any available stylist';
     return data?.barbers.find((b) => b.id === state.barberId)?.name ?? '';
   };
   const skipBarberStep = () => (data?.barbers.length ?? 0) <= 1;
@@ -244,7 +244,7 @@ export function initBooking({ data: embedded }) {
   function updateFooter() {
     const s = service();
     const parts = [];
-    if (state.barberId !== undefined && !skipBarberStep()) parts.push(state.barberId === null ? 'Any barber' : barberName());
+    if (state.barberId !== undefined && !skipBarberStep()) parts.push(state.barberId === null ? 'Any stylist' : barberName());
     if (state.date) parts.push(formatDate(state.date));
     if (state.time) parts.push(state.timeLabel);
     el.summary.innerHTML = s
@@ -255,7 +255,7 @@ export function initBooking({ data: embedded }) {
     el.next.classList.toggle('is-loading', state.submitting);
     el.next.innerHTML = state.submitting
       ? `<span class="spinner" aria-hidden="true"></span><span>Booking…</span>`
-      : `<span>${isDetails ? 'Confirm Booking' : 'Continue'}</span>${icon(isDetails ? 'check' : 'arrow-right', 'btn__arrow')}`;
+      : `<span>${isDetails ? 'Confirm booking' : 'Continue'}</span>${icon(isDetails ? 'check' : 'arrow-right', 'btn__arrow')}`;
   }
 
   function stepWrap(inner, back) {
@@ -328,7 +328,7 @@ export function initBooking({ data: embedded }) {
   }
 
   /* ------------------------------------------------------------------ */
-  /* Step 2 — Barber                                                    */
+  /* Step 2 — Stylist                                                   */
   /* ------------------------------------------------------------------ */
 
   function renderBarber({ back }) {
@@ -352,9 +352,9 @@ export function initBooking({ data: embedded }) {
       </label>`;
     };
     el.body.innerHTML = stepWrap(
-      `<p class="step__intro">Have a favourite? Pick them — or choose any barber for the most available times.</p>
-      <div class="option-list" role="radiogroup" aria-label="Barbers">
-        ${option(null, 'Any available barber', 'First available — the quickest way to get booked', icon('users'), 'Fastest')}
+      `<p class="step__intro">Have a favourite? Pick them — or choose any stylist for the most available times.</p>
+      <div class="option-list" role="radiogroup" aria-label="Stylists">
+        ${option(null, 'Any available stylist', 'First available — the quickest way to get booked', icon('users'), 'Fastest')}
         ${data.barbers.map((b) => option(b.id, b.name, b.title, esc(initials(b.name)))).join('')}
       </div>`,
       back,
@@ -559,7 +559,7 @@ export function initBooking({ data: embedded }) {
         <span class="state__icon">${icon('calendar')}</span>
         <p class="state__title">No times left on this day</p>
         <p class="state__text">${result.slots.length ? 'Every slot is booked.' : 'There are no bookable times on this day.'} Try another date${
-          state.barberId ? ' or choose “Any available barber”' : ''
+          state.barberId ? ' or choose “Any available stylist”' : ''
         }.</p>
         <div class="state__actions"><button type="button" class="btn btn--primary btn--sm" data-change-date>Choose another date</button></div>
       </div>`;
@@ -626,7 +626,7 @@ export function initBooking({ data: embedded }) {
     const d = state.details;
     const rows = [
       ['Service', s.name],
-      ...(!skipBarberStep() || state.barberId ? [['Barber', barberName()]] : []),
+      ...(!skipBarberStep() || state.barberId ? [['Stylist', barberName()]] : []),
       ['Date', formatDate(state.date, { weekday: 'long', month: 'long', day: 'numeric' })],
       ['Time', state.timeLabel],
       ...(s.duration ? [['Duration', s.duration]] : []),
@@ -651,7 +651,7 @@ export function initBooking({ data: embedded }) {
           ${field('name', 'Full name', 'type="text" autocomplete="name" maxlength="80" required autocapitalize="words"', { full: true })}
           ${field('phone', 'Phone number', 'type="tel" inputmode="tel" autocomplete="tel" maxlength="30" required placeholder="(780) 555-0123"')}
           ${field('email', 'Email', 'type="email" inputmode="email" autocomplete="email" maxlength="254" required autocapitalize="off" spellcheck="false"')}
-          ${field('notes', 'Notes', 'rows="3" maxlength="500" placeholder="Anything your barber should know?"', { full: true, optional: true, textarea: true })}
+          ${field('notes', 'Notes', 'rows="3" maxlength="500" placeholder="Anything your stylist should know?"', { full: true, optional: true, textarea: true })}
         </div>
         <div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
         <p class="form-note">We’ll only use your details to confirm and manage this appointment.</p>
@@ -818,7 +818,7 @@ export function initBooking({ data: embedded }) {
     const first = r.customerName.split(' ')[0];
     const rows = [
       ['Service', r.serviceName],
-      ['Barber', r.barberName],
+      ['Stylist', r.barberName],
       ['Date', r.dateLabel],
       ['Time', r.timeLabel],
       ['Name', r.customerName],
@@ -828,14 +828,14 @@ export function initBooking({ data: embedded }) {
       <div class="confirm__mark" aria-hidden="true">
         <svg viewBox="0 0 92 92"><circle cx="46" cy="46" r="43"></circle><path d="M29 47.5l11.5 11.5L64 35.5"></path></svg>
       </div>
-      <h3 class="confirm__title">Appointment Confirmed</h3>
+      <h3 class="confirm__title">Appointment confirmed</h3>
       <p class="confirm__text">Thanks, ${esc(first)} — you’re booked in.${
         state.emailQueued ? ` A confirmation is on its way to <strong>${esc(r.customerEmail)}</strong>.` : ' Save your details below.'
       }</p>
       <dl class="detail-list">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
       <div class="confirm__actions">
-        <a class="btn btn--outline" href="${esc(r.calendarUrl)}" download>${icon('calendar')}<span>Add to Calendar</span></a>
-        <a class="btn btn--outline" href="${esc(r.manageUrl)}">${icon('external')}<span>Manage Booking</span></a>
+        <a class="btn btn--outline" href="${esc(r.calendarUrl)}" download>${icon('calendar')}<span>Add to calendar</span></a>
+        <a class="btn btn--outline" href="${esc(r.manageUrl)}">${icon('external')}<span>Manage booking</span></a>
         <button type="button" class="btn btn--primary" data-done><span>Done</span></button>
       </div>
     </div>`;

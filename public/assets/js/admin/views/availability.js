@@ -180,7 +180,7 @@ function blocksCard(blocks, ctx) {
       name: 'barberId',
       type: 'select',
       value: '',
-      options: [{ value: '', label: 'Whole shop (all barbers)' }, ...state.barbers.map((b) => ({ value: b.id, label: b.name }))],
+      options: [{ value: '', label: 'Whole shop (all stylists)' }, ...state.barbers.map((b) => ({ value: b.id, label: b.name }))],
     }),
     h('div', { class: 'form-row form-row--2' }, field({ label: 'From', name: 'dateFrom', type: 'date', value: t, attrs: { min: t } }), field({ label: 'To', name: 'dateTo', type: 'date', value: t, attrs: { min: t } })),
     checkField({ label: 'All day', name: 'allDay', checked: true }),

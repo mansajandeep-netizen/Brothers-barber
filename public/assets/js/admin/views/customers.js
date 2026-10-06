@@ -134,7 +134,7 @@ async function renderDetail(ctx, id) {
         h(
           'table',
           { class: 'table table--stack' },
-          h('thead', null, h('tr', null, ['When', 'Service', 'Barber', 'Status'].map((t) => h('th', { scope: 'col' }, t)))),
+          h('thead', null, h('tr', null, ['When', 'Service', 'Stylist', 'Status'].map((t) => h('th', { scope: 'col' }, t)))),
           h(
             'tbody',
             null,
@@ -144,7 +144,7 @@ async function renderDetail(ctx, id) {
                 { class: 'is-clickable', onClick: () => openAppointmentEditor({ appointment: a, onSaved: refresh }) },
                 h('td', null, h('span', { class: 'cell-title' }, fmtDate(a.date, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })), h('span', { class: 'cell-sub' }, fmtTime(a.start))),
                 h('td', { 'data-label': 'Service' }, a.serviceName),
-                h('td', { 'data-label': 'Barber' }, a.barberName),
+                h('td', { 'data-label': 'Stylist' }, a.barberName),
                 h('td', null, statusBadge(a.status)),
               ),
             ),

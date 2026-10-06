@@ -70,7 +70,7 @@ export function openAppointmentEditor({ appointment = null, preset = {}, onSaved
   const barbers = state.barbers;
 
   if (!services.length || !barbers.length) {
-    toast(!services.length ? 'Add a service first (Services & Prices).' : 'Add a barber first (Barbers).', 'error');
+    toast(!services.length ? 'Add a service first (Services & Prices).' : 'Add a stylist first (Stylists).', 'error');
     return;
   }
 
@@ -104,7 +104,7 @@ export function openAppointmentEditor({ appointment = null, preset = {}, onSaved
       'div',
       { class: 'form-row form-row--2' },
       field({ label: 'Service', name: 'serviceId', type: 'select', value: initial.serviceId, options: serviceOptions }),
-      field({ label: 'Barber', name: 'barberId', type: 'select', value: initial.barberId, options: barberOptions }),
+      field({ label: 'Stylist', name: 'barberId', type: 'select', value: initial.barberId, options: barberOptions }),
     ),
     h(
       'div',

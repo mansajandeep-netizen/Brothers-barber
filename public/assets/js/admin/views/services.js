@@ -89,7 +89,7 @@ function openEditor(service, data, onDone) {
       'div',
       { class: 'form-row form-row--2' },
       field({ label: 'Service name', name: 'name', value: s?.name ?? '', attrs: { maxlength: 60 } }),
-      field({ label: 'Category', name: 'category', type: 'select', value: s?.category ?? 'haircuts', options: Object.entries(data.categories).map(([value, label]) => ({ value, label })) }),
+      field({ label: 'Category', name: 'category', type: 'select', value: s?.category ?? 'barbershop', options: Object.entries(data.categories).map(([value, label]) => ({ value, label })) }),
     ),
     field({ label: 'Description', name: 'description', type: 'textarea', value: s?.description ?? '', attrs: { maxlength: 300, rows: 2 }, hint: 'One or two short sentences shown on the website.' }),
     h(

@@ -6,7 +6,7 @@ import { addDays, diffDays, startOfWeek, timeToMinutes, zonedNow } from '../lib/
 import { rateLimiter, serializeCookie } from '../http.js';
 import { CATEGORIES, PLACEHOLDER_BARBER_NAME } from '../seed-data.js';
 
-export const SESSION_COOKIE = 'bb_session';
+export const SESSION_COOKIE = 'mh_session';
 const STATUSES = ['booked', 'completed', 'cancelled', 'no_show'];
 
 export function registerAdminRoutes(router, deps) {
@@ -127,12 +127,20 @@ export function registerAdminRoutes(router, deps) {
     const noPrice = services.filter((s) => s.priceCents == null).length;
     const noDuration = services.filter((s) => !s.durationMin).length;
     const placeholders = gallery().filter((g) => g.placeholder).length;
+    const flags = store.settings.flags();
     return [
+      {
+        id: 'hours',
+        done: !!flags.hoursConfirmed,
+        label: 'Confirm your opening hours',
+        hint: 'Hours were set from public listings. Check them, then press “Save hours”.',
+        link: '#/availability',
+      },
       {
         id: 'barbers',
         done: barbers.length > 0 && !barbers.some((b) => PLACEHOLDER_BARBER_NAME.test(b.name)),
-        label: 'Add your barbers’ real names',
-        hint: 'Placeholder names like “Barber 1” are shown to customers when they book.',
+        label: 'Add your stylists’ real names',
+        hint: 'Placeholder names like “Stylist 1” are shown to customers when they book.',
         link: '#/barbers',
       },
       {
@@ -171,6 +179,13 @@ export function registerAdminRoutes(router, deps) {
         link: '#/reviews',
       },
       {
+        id: 'rating',
+        done: business.googleRating != null && business.googleReviewCount != null,
+        label: 'Add your Google rating (optional)',
+        hint: 'Your star rating and review count appear on the website once added.',
+        link: '#/settings',
+      },
+      {
         id: 'social',
         done: !!(business.instagramUrl || business.facebookUrl || business.tiktokUrl),
         label: 'Add social media links (optional)',
@@ -205,7 +220,7 @@ export function registerAdminRoutes(router, deps) {
     const v = validate(body);
     const data = {
       serviceId: v.id('serviceId', { required: true, label: 'Service' }),
-      barberId: v.id('barberId', { required: true, label: 'Barber' }),
+      barberId: v.id('barberId', { required: true, label: 'Stylist' }),
       date: v.date('date'),
       time: v.time('time'),
       durationMin: v.int('durationMin', { min: 5, max: 480, label: 'Duration' }),
@@ -247,7 +262,7 @@ export function registerAdminRoutes(router, deps) {
   router.get('/api/admin/slots', staff, (ctx) => {
     const v = validate(Object.fromEntries(ctx.query));
     const serviceId = v.id('serviceId', { required: true, label: 'Service' });
-    const barberId = v.id('barberId', { required: true, label: 'Barber' });
+    const barberId = v.id('barberId', { required: true, label: 'Stylist' });
     const date = v.date('date');
     const excludeId = v.id('excludeId') ?? 0;
     const durationMin = v.int('durationMin', { min: 5, max: 480, label: 'Duration' });
@@ -385,6 +400,7 @@ export function registerAdminRoutes(router, deps) {
     if (new Set(hours.map((h) => h.day)).size !== 7) fields.hours = 'Each day must appear once.';
     if (Object.keys(fields).length) throw new HttpError(422, 'Please check the highlighted days.', { code: 'VALIDATION', fields });
     store.hours.save(hours);
+    store.settings.saveFlags({ hoursConfirmed: true });
     return { hours: store.hours.list() };
   }));
 
@@ -418,7 +434,7 @@ export function registerAdminRoutes(router, deps) {
     if (start && end && timeToMinutes(end) <= timeToMinutes(start)) v.fail('end', 'End time must be after the start time.');
     if (dateFrom && dateTo && diffDays(dateFrom, dateTo) > 366) v.fail('dateTo', 'Blocks can be at most one year long.');
     v.done();
-    if (barberId && !store.barbers.getLive(barberId)) throw new HttpError(422, 'Barber not found.');
+    if (barberId && !store.barbers.getLive(barberId)) throw new HttpError(422, 'Stylist not found.');
     const blockId = store.blocks.create({
       barberId,
       dateFrom,
@@ -475,18 +491,21 @@ export function registerAdminRoutes(router, deps) {
   router.get('/api/admin/business', staff, () => ({ business: store.settings.business() }));
   router.put('/api/admin/business', owner, mutate(async (ctx) => {
     const v = validate(await ctx.body());
-    const rating = Number(v.text('googleRating', { required: true, max: 4, label: 'Google rating' }));
-    if (!(rating >= 1 && rating <= 5)) v.fail('googleRating', 'Rating must be between 1 and 5.');
+    const ratingText = v.text('googleRating', { max: 4, label: 'Google rating' });
+    const rating = ratingText === '' ? null : Number(ratingText);
+    if (rating !== null && !(rating >= 1 && rating <= 5)) v.fail('googleRating', 'Rating must be between 1 and 5, or left blank.');
     const business = {
       name: v.text('name', { required: true, max: 80, label: 'Business name' }),
       phone: v.phone('phone', { required: true }),
       email: v.email('email'),
+      building: v.text('building', { max: 80, label: 'Building or mall' }),
       streetAddress: v.text('streetAddress', { required: true, max: 120, label: 'Street address' }),
       city: v.text('city', { required: true, max: 60, label: 'City' }),
       region: v.text('region', { required: true, max: 30, label: 'Province' }),
       postalCode: v.text('postalCode', { required: true, max: 12, label: 'Postal code' }).toUpperCase(),
-      googleRating: Math.round(rating * 10) / 10,
-      googleReviewCount: v.int('googleReviewCount', { required: true, min: 0, max: 1000000, label: 'Review count' }),
+      foundedYear: v.int('foundedYear', { min: 1800, max: 2100, label: 'Year established' }),
+      googleRating: rating === null ? null : Math.round(rating * 10) / 10,
+      googleReviewCount: v.int('googleReviewCount', { min: 0, max: 1000000, label: 'Review count' }),
       reviewsUrl: v.url('reviewsUrl', { label: 'Google reviews link' }),
       instagramUrl: v.url('instagramUrl', { label: 'Instagram link' }),
       facebookUrl: v.url('facebookUrl', { label: 'Facebook link' }),

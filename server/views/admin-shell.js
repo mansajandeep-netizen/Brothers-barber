@@ -9,11 +9,11 @@ export function renderAdminShell(site) {
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Dashboard | ${site.business.name}</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#0c0c0d">
+<meta name="theme-color" content="#ffffff">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap">
 <link rel="stylesheet" href="${site.asset('/assets/css/admin.css')}">
 <script type="module" src="${site.asset('/assets/js/admin/app.js')}"></script>
 </head>

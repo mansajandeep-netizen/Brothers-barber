@@ -63,8 +63,8 @@ export async function render(ctx) {
 
   const barberSelect = h(
     'select',
-    { class: 'select', 'aria-label': 'Filter by barber', style: { width: 'auto' }, onChange: (e) => go({ barber: e.target.value }) },
-    h('option', { value: '' }, 'All barbers'),
+    { class: 'select', 'aria-label': 'Filter by stylist', style: { width: 'auto' }, onChange: (e) => go({ barber: e.target.value }) },
+    h('option', { value: '' }, 'All stylists'),
     state.barbers.map((b) => h('option', { value: b.id, selected: String(b.id) === barber }, b.name)),
   );
 
@@ -225,7 +225,7 @@ async function renderDay(body, { date, barber, refresh }) {
         hourLabels,
         columns,
       )
-    : empty({ iconName: 'user', title: 'No barbers yet', text: 'Add a barber to start taking bookings.' });
+    : empty({ iconName: 'user', title: 'No stylists yet', text: 'Add a stylist to start taking bookings.' });
   if (barbers.length) {
     timeline.style.setProperty('--cols', barbers.length);
     timeline.style.setProperty('--slot-h', `${30 * PX_PER_MIN}px`);
@@ -325,7 +325,7 @@ async function renderList(body, { date, barber, status, q, refresh }) {
             h(
               'table',
               { class: 'table table--stack' },
-              h('thead', null, h('tr', null, ['When', 'Customer', 'Service', 'Barber', 'Status', ''].map((t) => h('th', { scope: 'col' }, t)))),
+              h('thead', null, h('tr', null, ['When', 'Customer', 'Service', 'Stylist', 'Status', ''].map((t) => h('th', { scope: 'col' }, t)))),
               h(
                 'tbody',
                 null,
@@ -336,7 +336,7 @@ async function renderList(body, { date, barber, status, q, refresh }) {
                     h('td', null, h('span', { class: 'cell-title' }, fmtDate(a.date)), h('span', { class: 'cell-sub' }, `${fmtTime(a.start)} · ${a.durationMin} min`)),
                     h('td', null, h('span', { class: 'cell-title' }, a.customer.name), h('span', { class: 'cell-sub' }, a.customer.phone)),
                     h('td', { 'data-label': 'Service' }, a.serviceName),
-                    h('td', { 'data-label': 'Barber' }, a.barberName),
+                    h('td', { 'data-label': 'Stylist' }, a.barberName),
                     h('td', null, statusBadge(a.status)),
                     h('td', { class: 'actions' }, button('Details', { variant: 'ghost', size: 'xs', iconName: 'edit', onClick: () => openAppointmentEditor({ appointment: a, onSaved: refresh }) })),
                   ),

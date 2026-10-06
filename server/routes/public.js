@@ -57,7 +57,7 @@ export function registerPublicRoutes(router, deps) {
     const q = Object.fromEntries(ctx.query);
     const v = validate(q);
     const serviceId = v.id('serviceId', { required: true, label: 'Service' });
-    const barberId = v.id('barberId', { label: 'Barber' });
+    const barberId = v.id('barberId', { label: 'Stylist' });
     const from = v.date('from', { label: 'Start date' });
     const to = v.date('to', { label: 'End date' });
     v.done();
@@ -68,7 +68,7 @@ export function registerPublicRoutes(router, deps) {
     throttle(readLimiter, ctx.ip);
     const v = validate(Object.fromEntries(ctx.query));
     const serviceId = v.id('serviceId', { required: true, label: 'Service' });
-    const barberId = v.id('barberId', { label: 'Barber' });
+    const barberId = v.id('barberId', { label: 'Stylist' });
     const date = v.date('date');
     v.done();
     return scheduler.slotsFor({ serviceId, barberId, date });
@@ -82,7 +82,7 @@ export function registerPublicRoutes(router, deps) {
     }
     const v = validate(body);
     const serviceId = v.id('serviceId', { required: true, label: 'Service' });
-    const barberId = v.id('barberId', { label: 'Barber' });
+    const barberId = v.id('barberId', { label: 'Stylist' });
     const date = v.date('date');
     const time = v.time('time');
     const name = v.text('name', { required: true, min: 2, max: 80, label: 'Full name' });
@@ -132,7 +132,7 @@ export function registerPublicRoutes(router, deps) {
       timezone: config.timezone,
       siteHost: new URL(config.siteUrl).host,
     });
-    ctx.res.setHeader('Content-Disposition', `attachment; filename="brothers-barber-${appt.reference}.ics"`);
+    ctx.res.setHeader('Content-Disposition', `attachment; filename="manhandler-${appt.reference}.ics"`);
     ctx.send(200, ics, 'text/calendar; charset=utf-8');
   });
 }

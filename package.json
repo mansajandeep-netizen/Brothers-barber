@@ -1,8 +1,8 @@
 {
-  "name": "brothers-barber-shop",
+  "name": "manhandler-barbershop",
   "version": "1.0.0",
   "private": true,
-  "description": "Website and appointment booking platform for Brothers Barber Shop, Grande Prairie, AB.",
+  "description": "Website and appointment booking platform for Manhandler Barbershop & Full Service Salon, Prairie Mall, Grande Prairie, AB.",
   "type": "module",
   "engines": {
     "node": ">=22.13.0"

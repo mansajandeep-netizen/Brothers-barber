@@ -51,6 +51,9 @@ const SYMBOLS = {
   ban: '<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
   copy: '<rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M15.5 8.5V5A1.5 1.5 0 0 0 14 3.5H5A1.5 1.5 0 0 0 3.5 5v9A1.5 1.5 0 0 0 5 15.5h3.5"/>',
   undo: '<path d="M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  droplet: '<path d="M12 3.5s-6.5 7-6.5 11.5a6.5 6.5 0 0 0 13 0C18.5 10.5 12 3.5 12 3.5z"/><path d="M9 15.5a3 3 0 0 0 3 3"/>',
+  sparkles:
+    '<path d="M10 3.5 11.6 8 16 9.5l-4.4 1.6L10 15.5 8.4 11.1 4 9.5 8.4 8z"/><path d="M17.5 14l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
 };
 
 /** Inline SVG sprite — included once per page. */

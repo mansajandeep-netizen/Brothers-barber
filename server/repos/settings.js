@@ -26,6 +26,9 @@ export function settingsRepo(db) {
     saveBusiness: (patch) => write('business', { ...read('business', DEFAULT_BUSINESS), ...patch }),
     booking: () => read('booking', DEFAULT_BOOKING),
     saveBooking: (patch) => write('booking', { ...read('booking', DEFAULT_BOOKING), ...patch }),
+    /** Small owner-progress flags, e.g. { hoursConfirmed: true }. */
+    flags: () => read('flags', {}),
+    saveFlags: (patch) => write('flags', { ...read('flags', {}), ...patch }),
   };
 }
 

@@ -3,24 +3,23 @@ import { icon, iconSprite } from './icons.js';
 import { fullAddress, groupedHours, telHref } from './format.js';
 
 const NAV = [
-  ['Home', 'top'],
+  ['Barbershop', 'barbershop'],
+  ['Salon', 'salon'],
   ['About', 'about'],
-  ['Services', 'services'],
   ['Gallery', 'gallery'],
   ['Reviews', 'reviews'],
   ['Location', 'location'],
 ];
 
-const FONTS =
-  'https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Instrument+Serif:ital@0;1&display=swap';
+const FONTS = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400..800&display=swap';
 
 export function logo({ href = '/', tag = 'a' } = {}) {
   const inner = html`<span class="logo__mark" aria-hidden="true">
-      <svg viewBox="0 0 40 40"><rect x="1" y="1" width="38" height="38" rx="3"></rect><path d="M14 11v18M14 11h7.2a4.4 4.4 0 0 1 0 8.8H14m0 0h8.4a4.6 4.6 0 0 1 0 9.2H14"></path></svg>
+      <svg viewBox="0 0 40 40"><rect x="0" y="0" width="40" height="40" rx="11"></rect><path d="M12.5 28V12.5l7.5 9 7.5-9V28"></path></svg>
     </span>
-    <span class="logo__text"><span class="logo__name">Brothers</span><span class="logo__sub">Barber Shop</span></span>`;
+    <span class="logo__text"><span class="logo__name">Manhandler</span><span class="logo__sub">Barbershop &amp; Salon</span></span>`;
   return tag === 'a'
-    ? html`<a class="logo" href="${href}" aria-label="Brothers Barber Shop — home">${inner}</a>`
+    ? html`<a class="logo" href="${href}" aria-label="Manhandler Barbershop &amp; Full Service Salon — home">${inner}</a>`
     : html`<span class="logo">${inner}</span>`;
 }
 
@@ -44,7 +43,7 @@ function header(site, { home }) {
     </nav>
     <div class="site-header__actions">
       <a class="site-header__phone" href="${telHref(b.phone)}">${icon('phone')}<span>${b.phone}</span></a>
-      ${bookLink('Book Now', { cls: 'btn btn--primary btn--sm site-header__book', arrow: false })}
+      ${bookLink('Book now', { cls: 'btn btn--primary btn--sm site-header__book', arrow: false })}
       <a class="icon-btn site-header__call" href="${telHref(b.phone)}" aria-label="Call ${b.name} at ${b.phone}">${icon('phone')}</a>
       <button class="icon-btn nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" data-nav-toggle>
         <span class="nav-toggle__bars" aria-hidden="true"><span></span><span></span><span></span></span>
@@ -62,8 +61,8 @@ function header(site, { home }) {
     </ul>
   </nav>
   <div class="mobile-menu__foot">
-    ${bookLink('Book an Appointment', { cls: 'btn btn--primary btn--block btn--lg' })}
-    <a class="btn btn--ghost btn--block btn--lg" href="${telHref(b.phone)}">${icon('phone')}<span>Call ${b.phone}</span></a>
+    ${bookLink('Book an appointment', { cls: 'btn btn--primary btn--block btn--lg' })}
+    <a class="btn btn--outline btn--block btn--lg" href="${telHref(b.phone)}">${icon('phone')}<span>Call ${b.phone}</span></a>
     <p class="mobile-menu__addr">${fullAddress(b)}</p>
   </div>
 </div>`;
@@ -92,28 +91,28 @@ function footer(site, { home }) {
   <div class="container site-footer__top">
     <div class="site-footer__brand">
       ${logo({ href: home ? '#top' : '/' })}
-      <p>Professional haircuts, fades, beard work and shaves in Grande Prairie, Alberta.</p>
-      ${bookLink('Book Appointment', { cls: 'btn btn--primary' })}
+      <p>Barbershop &amp; full service salon${b.building ? ` inside ${b.building}` : ''} in ${b.city}, Alberta${b.foundedYear ? ` — since ${b.foundedYear}` : ''}.</p>
+      ${bookLink('Book appointment', { cls: 'btn btn--primary' })}
       ${socialLinks(b)}
     </div>
     <div class="site-footer__col">
       <h2 class="site-footer__title">Visit</h2>
       <address>
-        ${b.name}<br>${b.streetAddress}<br>${b.city}, ${b.region} ${b.postalCode}
+        ${b.name}<br>${b.building ? html`${b.building}<br>` : ''}${b.streetAddress}<br>${b.city}, ${b.region} ${b.postalCode}
       </address>
       <a class="site-footer__phone" href="${telHref(b.phone)}">${icon('phone')}${b.phone}</a>
     </div>
     <div class="site-footer__col">
-      <h2 class="site-footer__title">Business Hours</h2>
+      <h2 class="site-footer__title">Hours</h2>
       <dl class="site-footer__hours">
         ${groupedHours(site.hours).map((g) => html`<div><dt>${g.label}</dt><dd>${g.value}</dd></div>`)}
       </dl>
     </div>
     <div class="site-footer__col">
-      <h2 class="site-footer__title">Quick Links</h2>
+      <h2 class="site-footer__title">Explore</h2>
       <ul class="site-footer__links">
         ${NAV.map(([label, id]) => html`<li><a href="${href(id)}">${label}</a></li>`)}
-        <li><a href="/book" data-book>Book Appointment</a></li>
+        <li><a href="/book" data-book>Book appointment</a></li>
       </ul>
     </div>
   </div>
@@ -121,6 +120,7 @@ function footer(site, { home }) {
     <p>© ${site.year} ${b.name}. All rights reserved.</p>
     ${site.preview ? '' : html`<p><a href="/admin" rel="nofollow">Staff login</a></p>`}
   </div>
+  <div class="container site-footer__mark" aria-hidden="true">${b.name.split(' ')[0]}</div>
 </footer>`;
 }
 
@@ -128,7 +128,7 @@ function mobileCta(site) {
   const b = site.business;
   return html`<div class="mobile-cta" data-mobile-cta>
   <a class="mobile-cta__call" href="${telHref(b.phone)}" aria-label="Call ${b.phone}">${icon('phone')}<span>Call</span></a>
-  ${bookLink('Book Now', { cls: 'btn btn--primary mobile-cta__book' })}
+  ${bookLink('Book now', { cls: 'btn btn--primary mobile-cta__book' })}
 </div>`;
 }
 
@@ -182,7 +182,7 @@ export function page(site, o) {
 <meta name="description" content="${description}">
 <meta name="robots" content="${robots}">
 <link rel="canonical" href="${canonical}">
-<meta name="theme-color" content="#0c0c0d">
+<meta name="theme-color" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${site.business.name}">

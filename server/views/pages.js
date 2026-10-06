@@ -1,7 +1,7 @@
 import { html } from './html.js';
 import { icon } from './icons.js';
 import { bookLink, page } from './layout.js';
-import { formatPrice, telHref } from './format.js';
+import { formatPrice, fullAddress, telHref } from './format.js';
 import { formatDateLong, formatTime12 } from '../lib/time.js';
 
 export function renderNotFound(site) {
@@ -15,12 +15,12 @@ export function renderNotFound(site) {
 <section class="simple-hero">
   <div class="container simple-hero__inner">
     <p class="simple-hero__code" aria-hidden="true">404</p>
-    <p class="eyebrow eyebrow--center"><span class="eyebrow__line" aria-hidden="true"></span>Page not found<span class="eyebrow__line" aria-hidden="true"></span></p>
+    <p class="eyebrow">Page not found</p>
     <h1 class="simple-hero__title">This page got <em>too close a shave.</em></h1>
     <p class="simple-hero__text">The page you’re looking for doesn’t exist or has moved. Let’s get you back in the chair.</p>
     <div class="simple-hero__actions">
-      <a class="btn btn--ghost btn--lg" href="/">${icon('arrow-left')}<span>Back to Home</span></a>
-      ${bookLink('Book an Appointment', { cls: 'btn btn--primary btn--lg' })}
+      <a class="btn btn--soft btn--lg" href="/">${icon('arrow-left')}<span>Back to home</span></a>
+      ${bookLink('Book an appointment', { cls: 'btn btn--primary btn--lg' })}
     </div>
   </div>
 </section>`,
@@ -39,7 +39,7 @@ export function renderManage(site, appt, { canCancel, reason }) {
   const [statusLabel, statusClass] = STATUS[appt.status] ?? ['Unknown', ''];
   const rows = [
     ['Service', appt.serviceName],
-    ['Barber', appt.barberName],
+    ['Stylist', appt.barberName],
     ['Date', formatDateLong(appt.date)],
     ['Time', formatTime12(appt.startMin)],
     ...(appt.priceCents != null ? [['Price', formatPrice(appt.priceCents)]] : []),
@@ -55,26 +55,26 @@ export function renderManage(site, appt, { canCancel, reason }) {
     content: html`
 <section class="manage">
   <div class="container manage__inner">
-    <p class="eyebrow"><span class="eyebrow__line" aria-hidden="true"></span>Your Appointment</p>
+    <p class="eyebrow">Your appointment</p>
     <h1 class="manage__title">${appt.status === 'cancelled' ? 'Appointment cancelled' : appt.status === 'booked' ? 'You’re booked in' : 'Appointment details'}</h1>
     <div class="manage__card" data-manage data-token="${appt.token}">
       <div class="manage__status"><span class="status-badge ${statusClass}">${statusLabel}</span><span class="manage__ref">${appt.reference}</span></div>
       <dl class="detail-list">
         ${rows.map(([k, v]) => html`<div><dt>${k}</dt><dd>${v}</dd></div>`)}
       </dl>
-      <p class="manage__addr">${icon('pin')}<span>${b.name}, ${b.streetAddress}, ${b.city}, ${b.region} ${b.postalCode}</span></p>
+      <p class="manage__addr">${icon('pin')}<span>${b.name}, ${fullAddress(b)}</span></p>
       <div class="manage__actions">
         ${appt.status === 'booked'
-          ? html`<a class="btn btn--outline" href="/api/bookings/${appt.token}/calendar.ics" download>${icon('calendar')}<span>Add to Calendar</span></a>`
+          ? html`<a class="btn btn--outline" href="/api/bookings/${appt.token}/calendar.ics" download>${icon('calendar')}<span>Add to calendar</span></a>`
           : ''}
         <a class="btn btn--outline" href="${telHref(b.phone)}">${icon('phone')}<span>Call ${b.phone}</span></a>
-        ${appt.status === 'booked' ? '' : bookLink('Book Again', { cls: 'btn btn--primary' })}
+        ${appt.status === 'booked' ? '' : bookLink('Book again', { cls: 'btn btn--primary' })}
       </div>
       ${appt.status === 'booked'
         ? canCancel
           ? html`<div class="manage__cancel">
               <p>Can’t make it? Cancel online so someone else can take the spot.</p>
-              <button type="button" class="btn btn--danger" data-cancel-appointment>${icon('close')}<span>Cancel Appointment</span></button>
+              <button type="button" class="btn btn--danger" data-cancel-appointment>${icon('close')}<span>Cancel appointment</span></button>
               <p class="form-error" role="alert" data-cancel-error hidden></p>
             </div>`
           : html`<p class="manage__note">${icon('info')}<span>${reason}</span></p>`

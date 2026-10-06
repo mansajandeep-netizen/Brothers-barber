@@ -8,7 +8,7 @@ function newReference() {
   const bytes = crypto.randomBytes(6);
   let s = '';
   for (const b of bytes) s += REF_ALPHABET[b % REF_ALPHABET.length];
-  return `BB-${s}`;
+  return `MH-${s}`;
 }
 
 export function phoneKey(phone) {

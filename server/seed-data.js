@@ -4,18 +4,21 @@
  */
 
 export const DEFAULT_BUSINESS = {
-  name: 'Brothers Barber Shop',
-  phone: '(780) 505-0013',
+  name: 'Manhandler Barbershop & Full Service Salon',
+  phone: '(780) 532-4678',
   email: '',
-  streetAddress: '9701 84 Ave #2',
+  building: 'Prairie Mall',
+  streetAddress: '11801 100 St #294',
   city: 'Grande Prairie',
   region: 'AB',
-  postalCode: 'T8V 4Z8',
+  postalCode: 'T8V 3Y2',
   country: 'CA',
-  googleRating: 4.8,
-  googleReviewCount: 154,
+  foundedYear: 1979,
+  // Not provided yet — the rating block stays hidden until the owner adds it.
+  googleRating: null,
+  googleReviewCount: null,
   reviewsUrl:
-    'https://www.google.com/maps/search/?api=1&query=Brothers%20Barber%20Shop%2C%209701%2084%20Ave%20%232%2C%20Grande%20Prairie%2C%20AB%20T8V%204Z8',
+    'https://www.google.com/maps/search/?api=1&query=Manhandler%20Barbershop%2C%20Prairie%20Mall%2C%2011801%20100%20St%20%23294%2C%20Grande%20Prairie%2C%20AB',
   instagramUrl: '',
   facebookUrl: '',
   tiktokUrl: '',
@@ -30,122 +33,57 @@ export const DEFAULT_BOOKING = {
   cancelCutoffHours: 2, // customers can self-cancel up to this many hours before
 };
 
-// Monday–Saturday 9 AM–7 PM, Sunday 9 AM–5 PM. Minutes after midnight.
+// Monday–Friday 10 AM–7 PM, Saturday 10 AM–6 PM, closed Sunday. Minutes after midnight.
 export const DEFAULT_HOURS = [
-  { day: 0, open: 9 * 60, close: 17 * 60 },
-  { day: 1, open: 9 * 60, close: 19 * 60 },
-  { day: 2, open: 9 * 60, close: 19 * 60 },
-  { day: 3, open: 9 * 60, close: 19 * 60 },
-  { day: 4, open: 9 * 60, close: 19 * 60 },
-  { day: 5, open: 9 * 60, close: 19 * 60 },
-  { day: 6, open: 9 * 60, close: 19 * 60 },
+  { day: 0, isOpen: false, open: 10 * 60, close: 18 * 60 },
+  { day: 1, isOpen: true, open: 10 * 60, close: 19 * 60 },
+  { day: 2, isOpen: true, open: 10 * 60, close: 19 * 60 },
+  { day: 3, isOpen: true, open: 10 * 60, close: 19 * 60 },
+  { day: 4, isOpen: true, open: 10 * 60, close: 19 * 60 },
+  { day: 5, isOpen: true, open: 10 * 60, close: 19 * 60 },
+  { day: 6, isOpen: true, open: 10 * 60, close: 18 * 60 },
 ];
 
-// Placeholder chairs — rename them in Admin → Barbers.
-export const SEED_BARBERS = ['Barber 1', 'Barber 2'];
+// Placeholder chairs — rename them in Admin → Stylists.
+export const SEED_BARBERS = ['Stylist 1', 'Stylist 2'];
 
-export const PLACEHOLDER_BARBER_NAME = /^Barber \d+$/;
+export const PLACEHOLDER_BARBER_NAME = /^(Barber|Stylist) \d+$/;
 
+// The two sides of the business. Every service belongs to one of them.
 export const CATEGORIES = {
-  haircuts: 'Haircuts',
-  'beard-grooming': 'Beard & Grooming',
+  barbershop: 'Barbershop',
+  salon: 'Salon',
 };
 
 export const SEED_SERVICES = [
   {
-    slug: 'custom-cut',
-    name: 'Custom Cut',
-    category: 'haircuts',
-    description: 'A cut built around your hair type, head shape and the style you want — talk it through with your barber first.',
+    slug: 'mens-haircut',
+    name: 'Men’s Haircut',
+    category: 'barbershop',
+    description: 'Classic or modern — tell us the look you’re after and we’ll cut it to suit you.',
   },
   {
-    slug: 'fade-cut',
-    name: 'Fade Cut',
-    category: 'haircuts',
-    description: 'Low, mid, high, skin or taper — a clean, seamless fade blended to suit your look.',
+    slug: 'womens-haircut',
+    name: 'Women’s Haircut',
+    category: 'salon',
+    description: 'Trims, fresh shapes and complete restyles, cut to suit your hair and your style.',
   },
   {
-    slug: 'buzz-cut',
-    name: 'Buzz Cut',
-    category: 'haircuts',
-    description: 'A sharp, even all-over clipper cut. Simple, clean and low-maintenance.',
-  },
-  {
-    slug: 'curly-hair',
-    name: 'Curly Hair',
-    category: 'haircuts',
-    description: 'Cutting and shaping that works with your natural curl pattern, not against it.',
-  },
-  {
-    slug: 'long-haircut',
-    name: 'Long Haircut',
-    category: 'haircuts',
-    description: 'Trims and restyles for longer hair, keeping length and shape exactly where you want it.',
-  },
-  {
-    slug: 'scissor-cut',
-    name: 'Scissor Cut',
-    category: 'haircuts',
-    description: 'A classic cut done with shears for natural texture and a softer, tailored finish.',
-  },
-  {
-    slug: 'razor-cut',
-    name: 'Razor Cut',
-    category: 'haircuts',
-    description: 'Razor-cut texture and movement for a lighter, more defined style.',
-  },
-  {
-    slug: 'kids-cuts',
-    name: "Kids' Cuts",
-    category: 'haircuts',
-    description: 'Clean, comfortable haircuts for kids — classic styles, fades and everything in between.',
-  },
-  {
-    slug: 'hair-shape-up',
-    name: 'Hair Shape Up',
-    category: 'haircuts',
-    description: 'Crisp edges along the hairline, temples and neckline to keep your cut sharp between visits.',
-  },
-  {
-    slug: 'head-shave',
-    name: 'Head Shave',
-    category: 'haircuts',
-    description: 'A smooth, close head shave, finished with care for the skin.',
-  },
-  {
-    slug: 'beard-trim',
-    name: 'Beard Trim',
-    category: 'beard-grooming',
-    description: 'Length control and shaping with clean, defined lines.',
-  },
-  {
-    slug: 'beard-maintenance',
-    name: 'Beard Maintenance',
-    category: 'beard-grooming',
-    description: 'Regular upkeep to keep your beard’s shape, line-up and length on point.',
-  },
-  {
-    slug: 'beard-conditioning',
-    name: 'Beard Conditioning',
-    category: 'beard-grooming',
-    description: 'A conditioning treatment to soften the beard and care for the skin underneath.',
-  },
-  {
-    slug: 'beard-dyeing',
-    name: 'Beard Dyeing',
-    category: 'beard-grooming',
-    description: 'Beard color to blend grey or refresh your tone, matched to suit you.',
-  },
-  {
-    slug: 'shave',
-    name: 'Shave',
-    category: 'beard-grooming',
-    description: 'A traditional shave for a close, clean finish.',
+    slug: 'hair-styling',
+    name: 'Hair Styling',
+    category: 'salon',
+    description: 'Traditional and trendy styling — for everyday, special occasions and everything in between.',
   },
   {
     slug: 'hair-coloring',
     name: 'Hair Coloring',
-    category: 'beard-grooming',
-    description: 'Color services to cover grey, refresh your tone or try something new.',
+    category: 'salon',
+    description: 'Color to cover grey, refresh your tone or try something new.',
+  },
+  {
+    slug: 'facial-waxing',
+    name: 'Facial Waxing',
+    category: 'salon',
+    description: 'Facial waxing for a clean, tidy finish.',
   },
 ];

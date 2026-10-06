@@ -28,7 +28,7 @@ export const config = {
   siteUrl,
   secureCookies: env.SECURE_COOKIES ? env.SECURE_COOKIES === 'true' : siteUrl.startsWith('https://'),
   trustProxy: env.TRUST_PROXY === 'true',
-  dbPath: env.DATABASE_PATH || path.join(ROOT_DIR, 'data', 'brothers.db'),
+  dbPath: env.DATABASE_PATH || path.join(ROOT_DIR, 'data', 'manhandler.db'),
   publicDir: path.join(ROOT_DIR, 'public'),
   contentDir: path.join(ROOT_DIR, 'content'),
   // Grande Prairie, AB observes Mountain Time.

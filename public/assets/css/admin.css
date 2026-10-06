@@ -1,39 +1,40 @@
 /* ==========================================================================
-   Brothers Barber Shop — admin dashboard
-   Dark brand sidebar, light working area for daytime readability.
+   Manhandler Barbershop & Full Service Salon — admin dashboard
+   Bright & modern: white sidebar and cards on a soft grey canvas, cobalt accent.
    ========================================================================== */
 
 :root {
-  --bg: #f4f1eb;
+  --bg: #f3f5f9;
   --surface: #ffffff;
-  --surface-2: #faf8f4;
-  --line: #e8e2d7;
-  --line-2: #d6cdbe;
-  --text: #17150f;
-  --text-2: #575147;
-  --text-3: #706a5f;
-  --gold: #c9a46a;
-  --gold-strong: #8a6630;
-  --gold-bg: #f7efe0;
-  --side: #0d0d0e;
-  --side-2: #18181a;
-  --side-text: #bdb7ac;
-  --ok: #23774a;
-  --ok-bg: #e5f3ea;
-  --warn: #9a5f0c;
-  --warn-bg: #fbf0dc;
-  --danger: #b63a28;
-  --danger-bg: #fbe8e4;
-  --info: #285f91;
-  --info-bg: #e6eff8;
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 14px;
-  --shadow: 0 1px 2px rgba(23, 21, 15, 0.05), 0 6px 20px -12px rgba(23, 21, 15, 0.18);
-  --shadow-lg: 0 30px 80px -30px rgba(23, 21, 15, 0.45);
-  --font: 'Archivo', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --surface-2: #f8fafc;
+  --line: #e5e7eb;
+  --line-2: #d1d5db;
+  --text: #111827;
+  --text-2: #4b5563;
+  --text-3: #5f6878;
+  --accent: #2f5bff;
+  --accent-hover: #1e46e6;
+  --accent-ink: #2448e8;
+  --accent-soft: #ebf0ff;
+  --side: #ffffff;
+  --side-2: #f3f5f9;
+  --side-text: #4b5563;
+  --ok: #166534;
+  --ok-bg: #dcfce7;
+  --warn: #92400e;
+  --warn-bg: #fef3c7;
+  --danger: #b91c1c;
+  --danger-bg: #fee2e2;
+  --info: #1e40af;
+  --info-bg: #dbeafe;
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 8px 24px -14px rgba(17, 24, 39, 0.16);
+  --shadow-lg: 0 32px 80px -30px rgba(17, 24, 39, 0.35);
+  --font: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --sidebar-w: 248px;
+  --sidebar-w: 252px;
 }
 
 *,
@@ -77,7 +78,7 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--gold-strong);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 
@@ -143,18 +144,18 @@ a {
   min-height: 100vh;
   padding: 24px 16px;
   background:
-    radial-gradient(80% 60% at 50% 0%, rgba(201, 164, 106, 0.14), transparent 70%),
-    var(--side);
-  color: #f2eee6;
+    radial-gradient(70% 55% at 50% 0%, rgba(47, 91, 255, 0.12), transparent 70%),
+    var(--bg);
+  color: var(--text);
 }
 
 .login__card {
   width: min(420px, 100%);
   padding: 36px 32px 30px;
-  border: 1px solid rgba(242, 238, 230, 0.1);
-  border-radius: var(--radius-lg);
-  background: #141416;
-  box-shadow: 0 40px 100px -30px rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
 }
 
 .login__brand {
@@ -166,29 +167,14 @@ a {
 
 .login h1 {
   margin: 0 0 6px;
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
-  font-stretch: 108%;
+  letter-spacing: -0.03em;
 }
 
 .login p {
   margin: 0 0 22px;
-  color: var(--side-text);
-}
-
-.login .field label {
-  color: var(--side-text);
-}
-
-.login .input {
-  border-color: rgba(242, 238, 230, 0.16);
-  background: #1b1b1e;
-  color: #f2eee6;
-}
-
-.login .input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(201, 164, 106, 0.25);
+  color: var(--text-2);
 }
 
 .login .btn {
@@ -196,15 +182,16 @@ a {
   margin-top: 8px;
 }
 
-.login__foot {
-  margin-top: 22px;
-  color: #8d877d;
+.login .login__foot {
+  margin: 22px 0 0;
+  color: var(--text-3);
   font-size: 13px;
   text-align: center;
 }
 
 .login__foot a {
-  color: var(--gold);
+  color: var(--accent-ink);
+  font-weight: 600;
 }
 
 /* ---------- Brand ---------- */
@@ -213,45 +200,42 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #f2eee6;
+  color: var(--text);
   text-decoration: none;
 }
 
 .brand svg {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .brand rect {
-  stroke: rgba(201, 164, 106, 0.55);
-  stroke-width: 1.6;
+  fill: var(--accent);
 }
 
 .brand path {
-  stroke: var(--gold);
-  stroke-width: 2.2;
+  stroke: #fff;
+  stroke-width: 2.6;
 }
 
 .brand__name {
   display: block;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
-  font-stretch: 125%;
-  letter-spacing: 0.14em;
+  letter-spacing: -0.025em;
   line-height: 1;
-  text-transform: uppercase;
 }
 
 .brand__sub {
   display: block;
   margin-top: 5px;
-  color: var(--gold);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.36em;
+  color: var(--text-3);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -277,6 +261,7 @@ a {
   flex-direction: column;
   width: var(--sidebar-w);
   padding: 22px 14px 16px;
+  border-right: 1px solid var(--line);
   background: var(--side);
   color: var(--side-text);
   transform: translateX(-100%);
@@ -285,6 +270,7 @@ a {
 
 .sidebar.is-open {
   transform: none;
+  box-shadow: var(--shadow-lg);
 }
 
 @media (min-width: 1024px) {
@@ -311,10 +297,10 @@ a {
 
 .nav__label {
   margin: 18px 12px 6px;
-  color: #8f8a80;
-  font-size: 10.5px;
+  color: var(--text-3);
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -324,10 +310,10 @@ a {
   gap: 12px;
   min-height: 42px;
   padding: 9px 12px;
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   color: var(--side-text);
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   transition:
     background-color 0.2s,
@@ -336,24 +322,24 @@ a {
 
 .nav a:hover {
   background: var(--side-2);
-  color: #f2eee6;
+  color: var(--text);
 }
 
 .nav a[aria-current='page'] {
-  background: rgba(201, 164, 106, 0.14);
-  color: #f2eee6;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
 }
 
 .nav a[aria-current='page'] .icon {
-  color: var(--gold);
+  color: var(--accent);
 }
 
 .nav__badge {
   margin-left: auto;
   padding: 1px 8px;
   border-radius: 99px;
-  background: var(--gold);
-  color: #17120a;
+  background: var(--accent);
+  color: #fff;
   font-size: 11px;
   font-weight: 700;
 }
@@ -361,7 +347,7 @@ a {
 .sidebar__foot {
   margin-top: auto;
   padding-top: 14px;
-  border-top: 1px solid rgba(242, 238, 230, 0.08);
+  border-top: 1px solid var(--line);
 }
 
 .user-card {
@@ -378,28 +364,28 @@ a {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #2a2a2e;
-  color: var(--gold);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
   font-size: 13px;
   font-weight: 800;
 }
 
 .avatar--light {
-  background: var(--gold-bg);
-  color: var(--gold-strong);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
 }
 
 .user-card__name {
   overflow: hidden;
-  color: #f2eee6;
+  color: var(--text);
   font-size: 13.5px;
-  font-weight: 600;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .user-card__role {
-  color: #9a948a;
+  color: var(--text-3);
   font-size: 12px;
   text-transform: capitalize;
 }
@@ -418,10 +404,11 @@ a {
   min-height: 38px;
   padding: 7px 12px;
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   background: none;
   color: var(--side-text);
   font-size: 13px;
+  font-weight: 600;
   text-align: left;
   text-decoration: none;
   cursor: pointer;
@@ -430,7 +417,7 @@ a {
 .sidebar__links a:hover,
 .sidebar__links button:hover {
   background: var(--side-2);
-  color: #f2eee6;
+  color: var(--text);
 }
 
 .scrim {
@@ -470,7 +457,7 @@ a {
   min-height: 64px;
   padding: 10px 16px;
   border-bottom: 1px solid var(--line);
-  background: rgba(244, 241, 235, 0.88);
+  background: rgba(243, 245, 249, 0.88);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
@@ -498,7 +485,6 @@ a {
   overflow: hidden;
   font-size: 18px;
   font-weight: 800;
-  font-stretch: 106%;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -546,7 +532,6 @@ a {
   margin: 0;
   font-size: 26px;
   font-weight: 800;
-  font-stretch: 106%;
   letter-spacing: -0.01em;
   line-height: 1.15;
 }
@@ -564,9 +549,9 @@ a {
   justify-content: center;
   gap: 8px;
   min-height: 40px;
-  padding: 8px 16px;
+  padding: 8px 18px;
   border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  border-radius: 999px;
   background: transparent;
   font-size: 14px;
   font-weight: 600;
@@ -593,18 +578,18 @@ a {
 }
 
 .btn--primary {
-  background: var(--gold);
-  color: #17120a;
-  box-shadow: 0 6px 16px -8px rgba(201, 164, 106, 0.8);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 8px 18px -10px rgba(47, 91, 255, 0.85);
 }
 
 .btn--primary:hover {
-  background: #d9b87f;
+  background: var(--accent-hover);
 }
 
 .btn--dark {
   background: var(--text);
-  color: #f7f4ee;
+  color: #fff;
 }
 
 .btn--dark:hover {
@@ -704,7 +689,7 @@ a {
 }
 
 .link {
-  color: var(--gold-strong);
+  color: var(--accent-ink);
   font-weight: 600;
   text-decoration: none;
 }
@@ -812,14 +797,13 @@ button.link {
 }
 
 .stat__label .icon {
-  color: var(--gold-strong);
+  color: var(--accent-ink);
 }
 
 .stat__value {
   margin: 8px 0 2px;
   font-size: 32px;
   font-weight: 800;
-  font-stretch: 110%;
   line-height: 1;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -832,20 +816,20 @@ button.link {
 
 .stat--accent {
   border-color: transparent;
-  background: var(--side);
-  color: #f2eee6;
+  background: linear-gradient(135deg, #2f5bff, #2244d8);
+  color: #fff;
 }
 
 .stat--accent .stat__label {
-  color: var(--side-text);
+  color: #fff;
 }
 
 .stat--accent .stat__label .icon {
-  color: var(--gold);
+  color: #fff;
 }
 
 .stat--accent .stat__meta {
-  color: #8d877d;
+  color: #fff;
 }
 
 /* ---------- Badges ---------- */
@@ -886,8 +870,8 @@ button.link {
 }
 
 .badge--cancelled {
-  background: #efece6;
-  color: #625d55;
+  background: #f1f3f6;
+  color: #4b5563;
 }
 
 .badge--no_show {
@@ -895,9 +879,9 @@ button.link {
   color: var(--danger);
 }
 
-.badge--gold {
-  background: var(--gold-bg);
-  color: var(--gold-strong);
+.badge--accent {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
 }
 
 .badge--warn {
@@ -1032,7 +1016,7 @@ button.link {
 }
 
 .appt__name:hover {
-  color: var(--gold-strong);
+  color: var(--accent-ink);
 }
 
 .appt__meta {
@@ -1048,7 +1032,7 @@ button.link {
 .appt__notes {
   margin-top: 6px;
   padding: 6px 10px;
-  border-left: 2px solid var(--gold);
+  border-left: 2px solid var(--accent);
   background: var(--surface-2);
   color: var(--text-2);
   font-size: 13px;
@@ -1078,8 +1062,8 @@ button.link {
   height: 48px;
   margin-bottom: 6px;
   border-radius: 50%;
-  background: var(--gold-bg);
-  color: var(--gold-strong);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
 }
 
 .empty__title {
@@ -1170,7 +1154,7 @@ button.link {
   display: block;
   height: 100%;
   border-radius: 6px;
-  background: linear-gradient(90deg, var(--gold-strong), var(--gold));
+  background: linear-gradient(90deg, var(--accent-ink), var(--accent));
   transition: width 0.6s var(--ease-out);
 }
 
@@ -1209,8 +1193,8 @@ button.link {
 }
 
 .seg button[aria-pressed='true'] {
-  background: var(--text);
-  color: #f7f4ee;
+  background: var(--accent);
+  color: #fff;
 }
 
 .date-nav {
@@ -1307,9 +1291,9 @@ button.link {
 .input:focus,
 .select:focus,
 .textarea:focus {
-  border-color: var(--gold-strong);
+  border-color: var(--accent-ink);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(201, 164, 106, 0.25);
+  box-shadow: 0 0 0 3px rgba(47, 91, 255, 0.25);
 }
 
 .input[aria-invalid='true'],
@@ -1348,7 +1332,7 @@ button.link {
   width: 18px;
   height: 18px;
   margin: 0;
-  accent-color: var(--gold-strong);
+  accent-color: var(--accent-ink);
 }
 
 /* Switch */
@@ -1400,7 +1384,7 @@ button.link {
 }
 
 .switch input:focus-visible + .switch__track {
-  outline: 2px solid var(--gold-strong);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 
@@ -1435,13 +1419,13 @@ button.link {
 }
 
 .day-pick input:checked + span {
-  border-color: var(--text);
-  background: var(--text);
-  color: #f7f4ee;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
 }
 
 .day-pick input:focus-visible + span {
-  outline: 2px solid var(--gold-strong);
+  outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
 }
 
@@ -1469,13 +1453,13 @@ button.link {
 }
 
 .time-chip:hover:not(:disabled) {
-  border-color: var(--gold-strong);
+  border-color: var(--accent-ink);
 }
 
 .time-chip.is-selected {
-  border-color: var(--gold-strong);
-  background: var(--gold-bg);
-  color: var(--gold-strong);
+  border-color: var(--accent-ink);
+  background: var(--accent-soft);
+  color: var(--accent-ink);
 }
 
 .time-chip:disabled {
@@ -1673,7 +1657,7 @@ button.link {
 }
 
 .timeline__slot:hover {
-  background: rgba(201, 164, 106, 0.12);
+  background: rgba(47, 91, 255, 0.12);
 }
 
 .timeline__slot:hover::after {
@@ -1681,7 +1665,7 @@ button.link {
   position: absolute;
   top: 50%;
   left: 10px;
-  color: var(--gold-strong);
+  color: var(--accent-ink);
   font-size: 11.5px;
   font-weight: 700;
   transform: translateY(-50%);
@@ -1691,7 +1675,7 @@ button.link {
   position: absolute;
   right: 0;
   left: 0;
-  background: repeating-linear-gradient(-45deg, #f3efe7 0 6px, #ebe5da 6px 12px);
+  background: repeating-linear-gradient(-45deg, #f7f8fa 0 6px, #eef0f4 6px 12px);
   pointer-events: none;
 }
 
@@ -1704,8 +1688,8 @@ button.link {
   align-items: flex-start;
   padding: 4px 8px;
   border-radius: 6px;
-  background: repeating-linear-gradient(-45deg, #f1e7d6 0 6px, #e9dcc6 6px 12px);
-  color: #6d5428;
+  background: repeating-linear-gradient(-45deg, #eef2ff 0 6px, #e3e9ff 6px 12px);
+  color: var(--accent-ink);
   font-size: 12px;
   font-weight: 600;
   overflow: hidden;
@@ -1825,12 +1809,12 @@ button.link {
 }
 
 .week__day.is-today {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 1px var(--gold);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .week__day.is-closed {
-  background: repeating-linear-gradient(-45deg, #faf8f4 0 8px, #f4f0e8 8px 16px);
+  background: repeating-linear-gradient(-45deg, #fafbfc 0 8px, #f1f3f6 8px 16px);
 }
 
 .week__head {
@@ -1848,7 +1832,7 @@ button.link {
 }
 
 .week__head:hover {
-  background: var(--gold-bg);
+  background: var(--accent-soft);
 }
 
 .week__dow {
@@ -1861,7 +1845,6 @@ button.link {
 .week__date {
   font-size: 20px;
   font-weight: 800;
-  font-stretch: 108%;
 }
 
 .week__count {
@@ -1899,8 +1882,8 @@ button.link {
 }
 
 .week__appt.is-cancelled {
-  border-left-color: #b9b2a6;
-  background: #f1eee8;
+  border-left-color: #c4c9d2;
+  background: #f1f3f6;
   color: var(--text-3);
   text-decoration: line-through;
 }
@@ -1969,8 +1952,8 @@ button.link {
 }
 
 .person__days span.is-on {
-  background: var(--text);
-  color: #f7f4ee;
+  background: var(--accent);
+  color: #fff;
 }
 
 .person__actions {
@@ -2188,8 +2171,8 @@ button.link {
   gap: 10px;
   padding: 12px 14px;
   border-radius: var(--radius);
-  background: var(--side);
-  color: #f2eee6;
+  background: #111827;
+  color: #fff;
   box-shadow: var(--shadow-lg);
   font-size: 14px;
   pointer-events: auto;
@@ -2202,7 +2185,7 @@ button.link {
 
 .toast .icon {
   margin-top: 1px;
-  color: var(--gold);
+  color: #93a9ff;
 }
 
 .toast--error .icon {
@@ -2233,7 +2216,7 @@ button.link {
   height: 14px;
   margin: 12px 20px;
   border-radius: 4px;
-  background: linear-gradient(90deg, #f1ede6 0%, #e7e1d6 50%, #f1ede6 100%);
+  background: linear-gradient(90deg, #f1f3f6 0%, #e5e8ee 50%, #f1f3f6 100%);
   background-size: 200% 100%;
   animation: shimmer 1.3s linear infinite;
 }

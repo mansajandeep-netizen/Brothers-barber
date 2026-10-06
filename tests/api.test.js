@@ -38,24 +38,40 @@ describe('public pages', () => {
     const res = await fetch(url('/'));
     assert.equal(res.status, 200);
     const html = await res.text();
-    assert.match(html, /<title>Brothers Barber Shop \| Barber in Grande Prairie, AB/);
+    assert.match(html, /<title>Manhandler Barbershop &amp; Full Service Salon \| Prairie Mall, Grande Prairie<\/title>/);
     assert.match(html, /<meta name="description" content="[^"]*Grande Prairie/);
     assert.match(html, /<link rel="canonical" href="http:\/\/127\.0\.0\.1:\d+\/">/);
     assert.match(html, /property="og:image"/);
     const ld = JSON.parse(html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1]);
-    assert.equal(ld['@type'], 'BarberShop');
-    assert.equal(ld.telephone, '+1-780-505-0013');
-    assert.equal(ld.address.postalCode, 'T8V 4Z8');
-    assert.equal(ld.openingHoursSpecification.length, 2);
+    assert.deepEqual(ld['@type'], ['BarberShop', 'HairSalon']);
+    assert.equal(ld.telephone, '+1-780-532-4678');
+    assert.equal(ld.address.streetAddress, '11801 100 St #294');
+    assert.equal(ld.address.postalCode, 'T8V 3Y2');
+    assert.equal(ld.containedInPlace.name, 'Prairie Mall');
+    assert.equal(ld.foundingDate, '1979');
+    // Monday–Friday 10–7 and Saturday 10–6; closed Sunday.
+    assert.deepEqual(
+      ld.openingHoursSpecification.map((s) => [s.dayOfWeek.join(','), s.opens, s.closes]),
+      [
+        ['Monday,Tuesday,Wednesday,Thursday,Friday', '10:00', '19:00'],
+        ['Saturday', '10:00', '18:00'],
+      ],
+    );
     assert.equal((html.match(/<h1[\s>]/g) || []).length, 1, 'exactly one h1');
   });
 
   test('every service is listed, with no invented prices', async () => {
     const html = await (await fetch(url('/'))).text();
-    for (const name of ['Hair Coloring', 'Beard Conditioning', 'Beard Dyeing', 'Beard Maintenance', 'Beard Trim', 'Buzz Cut', 'Curly Hair', 'Custom Cut', 'Fade Cut', 'Hair Shape Up', 'Head Shave', 'Kids’ Cuts', 'Long Haircut', 'Razor Cut', 'Scissor Cut', 'Shave']) {
+    for (const name of ['Men’s Haircut', 'Women’s Haircut', 'Hair Styling', 'Hair Coloring', 'Facial Waxing']) {
       assert.ok(html.includes(name.replace('’', "'")) || html.includes(name.replace('’', '&#39;')) || html.includes(name), `missing ${name}`);
     }
     assert.ok(!/service-card__price/.test(html), 'no prices until the owner adds them');
+  });
+
+  test('no Google rating or star reviews are shown until the owner adds them', async () => {
+    const html = await (await fetch(url('/'))).text();
+    assert.ok(!html.includes('trust__score'), 'no rating block');
+    assert.ok(!html.includes('class="stars'), 'no star ratings');
   });
 
   test('prices added in the admin appear on the site', async () => {
@@ -100,7 +116,7 @@ describe('public pages', () => {
 describe('public booking API', () => {
   test('options expose services and barbers', async () => {
     const data = await json(await fetch(url('/api/booking/options')));
-    assert.equal(data.services.length, 16);
+    assert.equal(data.services.length, 5);
     assert.equal(data.barbers.length, 2);
     assert.equal(data.services[0].price, '');
   });
@@ -117,8 +133,8 @@ describe('public booking API', () => {
     const ok = await postJson('/api/bookings', data);
     assert.equal(ok.status, 201);
     const body = await json(ok);
-    assert.match(body.appointment.reference, /^BB-[A-Z0-9]{6}$/);
-    assert.equal(body.appointment.barberName, 'Barber 1');
+    assert.match(body.appointment.reference, /^MH-[A-Z0-9]{6}$/);
+    assert.equal(body.appointment.barberName, 'Stylist 1');
     assert.equal(body.emailQueued, false);
 
     const again = await postJson('/api/bookings', { ...data, name: 'Someone Else', phone: '7805550111' });
@@ -212,19 +228,19 @@ describe('admin API', () => {
     assert.equal(withToken.status, 200);
   });
 
-  test('owner manages services, prices and barbers', async () => {
+  test('owner manages services, prices and stylists', async () => {
     const { cookie, csrf } = await login('owner@example.com', 'owner-password-1');
     const headers = { Cookie: cookie, 'Content-Type': 'application/json', 'X-CSRF-Token': csrf };
     const svc = await fetch(url('/api/admin/services/1'), {
       method: 'PATCH',
       headers,
-      body: JSON.stringify({ name: 'Custom Cut', category: 'haircuts', description: 'Tailored cut.', price: '40', durationMin: 45, isActive: true, sortOrder: 10 }),
+      body: JSON.stringify({ name: 'Men’s Haircut', category: 'barbershop', description: 'Tailored cut.', price: '40', durationMin: 45, isActive: true, sortOrder: 10 }),
     });
     const { service } = await json(svc);
     assert.equal(service.priceCents, 4000);
     assert.equal(service.durationMin, 45);
 
-    const barber = await fetch(url('/api/admin/barbers/2'), { method: 'PATCH', headers, body: JSON.stringify({ name: 'Alex', title: 'Barber', workDays: [1, 2, 3, 4, 5], isActive: true, sortOrder: 20 }) });
+    const barber = await fetch(url('/api/admin/barbers/2'), { method: 'PATCH', headers, body: JSON.stringify({ name: 'Alex', title: 'Stylist', workDays: [1, 2, 3, 4, 5], isActive: true, sortOrder: 20 }) });
     assert.equal((await json(barber)).barber.name, 'Alex');
 
     const bad = await fetch(url('/api/admin/services/1'), { method: 'PATCH', headers, body: JSON.stringify({ name: '', category: 'nope', price: 'abc' }) });
@@ -273,14 +289,22 @@ describe('admin API', () => {
     assert.ok(slots.slots.filter((s) => s.time >= '12:00' && s.time < '14:00').every((s) => !s.available));
   });
 
-  test('business info edits flow to the public site', async () => {
+  test('business info edits flow to the public site, including the optional Google rating', async () => {
     const { cookie, csrf } = await login('owner@example.com', 'owner-password-1');
     const headers = { Cookie: cookie, 'Content-Type': 'application/json', 'X-CSRF-Token': csrf };
     const current = (await json(await fetch(url('/api/admin/business'), { headers }))).business;
-    const res = await fetch(url('/api/admin/business'), { method: 'PUT', headers, body: JSON.stringify({ ...current, instagramUrl: 'https://instagram.com/example' }) });
+    const bad = await fetch(url('/api/admin/business'), { method: 'PUT', headers, body: JSON.stringify({ ...current, googleRating: '7' }) });
+    assert.equal(bad.status, 422);
+    const res = await fetch(url('/api/admin/business'), {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({ ...current, instagramUrl: 'https://instagram.com/example', googleRating: '4.7', googleReviewCount: '85' }),
+    });
     assert.equal(res.status, 200);
     const html = await (await fetch(url('/'))).text();
     assert.match(html, /on Instagram/);
+    assert.match(html, /class="trust__score"/);
+    assert.match(html, /85\+ Google reviews/);
     await fetch(url('/api/admin/business'), { method: 'PUT', headers, body: JSON.stringify({ ...current }) });
   });
 

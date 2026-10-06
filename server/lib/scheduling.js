@@ -81,7 +81,7 @@ export function createScheduler(store, { timezone, now = () => new Date() }) {
   function requireBookableBarber(barberId) {
     const barber = store.barbers.getLive(barberId);
     if (!barber || !barber.isActive) {
-      throw new HttpError(422, 'That barber isn’t taking online bookings right now. Please choose another.', {
+      throw new HttpError(422, 'That stylist isn’t taking online bookings right now. Please choose another.', {
         code: 'BARBER_UNAVAILABLE',
       });
     }
@@ -207,7 +207,7 @@ export function createScheduler(store, { timezone, now = () => new Date() }) {
         }
         const service = requireService(serviceId, { allowInactive: true });
         const barber = store.barbers.getLive(barberId) ?? (existing?.barberId === barberId ? store.barbers.get(barberId) : null);
-        if (!barber) throw new HttpError(422, 'Please choose a barber.', { code: 'VALIDATION', fields: { barberId: 'Choose a barber' } });
+        if (!barber) throw new HttpError(422, 'Please choose a stylist.', { code: 'VALIDATION', fields: { barberId: 'Choose a stylist' } });
 
         const duration = durationMin || durationFor(service, ctx.rules);
         const startMin = timeToMinutes(time);
@@ -221,7 +221,7 @@ export function createScheduler(store, { timezone, now = () => new Date() }) {
           const other = store.appointments.get(clash.id);
           throw new HttpError(
             409,
-            `${barber.name} already has ${other.customer.name} booked at ${formatTime12(other.startMin)}. Choose another time or barber.`,
+            `${barber.name} already has ${other.customer.name} booked at ${formatTime12(other.startMin)}. Choose another time or stylist.`,
             { code: 'BARBER_BUSY' },
           );
         }

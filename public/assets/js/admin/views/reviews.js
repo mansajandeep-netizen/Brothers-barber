@@ -8,13 +8,13 @@ export async function render(ctx) {
   const reload = () => ctx.refresh();
   setActions(button('Add review', { variant: 'secondary', size: 'sm', iconName: 'plus', onClick: () => openEditor(null, reviews.length, reload) }));
 
-  const stars = (n) => h('span', { 'aria-label': `${n} out of 5 stars`, style: { color: '#b48a48', letterSpacing: '2px' } }, '★'.repeat(n) + '☆'.repeat(5 - n));
+  const stars = (n) => h('span', { 'aria-label': `${n} out of 5 stars`, style: { color: 'var(--accent)', letterSpacing: '2px' } }, '★'.repeat(n) + '☆'.repeat(5 - n));
 
   el.replaceChildren(
     h(
       'div',
       { class: 'page__head' },
-      h('div', null, h('h2', null, 'Reviews'), h('p', null, `Website shows your Google rating (${business.googleRating} from ${business.googleReviewCount} reviews) plus any reviews you feature here.`)),
+      h('div', null, h('h2', null, 'Reviews'), h('p', null, business.googleRating != null ? `Website shows your Google rating (${business.googleRating} from ${business.googleReviewCount} reviews) plus any reviews you feature here.` : 'Feature real Google reviews on your website. Add your star rating in Business Info.')),
       business.reviewsUrl ? h('a', { class: 'btn btn--secondary btn--sm', href: business.reviewsUrl, target: '_blank', rel: 'noopener' }, icon('external'), h('span', null, 'Open Google reviews')) : null,
     ),
     h(
@@ -69,7 +69,7 @@ export async function render(ctx) {
         : empty({
             iconName: 'star',
             title: 'No featured reviews yet',
-            text: 'The website already shows your Google rating. Add a few real reviews to show them on the page too.',
+            text: 'Add a few real reviews from Google to show them on the website.',
             action: button('Add review', { variant: 'primary', size: 'sm', iconName: 'plus', onClick: () => openEditor(null, 0, reload) }),
           }),
     ),

@@ -205,15 +205,79 @@ const MIGRATIONS = [
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
   `,
+  // 2: service categories are now "haircuts" and "salon" (styling, color & waxing).
+  // SQLite can't alter a CHECK constraint, so the table is rebuilt with keys preserved.
+  {
+    foreignKeysOff: true,
+    sql: `
+    CREATE TABLE services_new (
+      id           INTEGER PRIMARY KEY,
+      slug         TEXT NOT NULL UNIQUE,
+      name         TEXT NOT NULL,
+      category     TEXT NOT NULL CHECK (category IN ('haircuts', 'salon')),
+      description  TEXT NOT NULL DEFAULT '',
+      duration_min INTEGER,
+      price_cents  INTEGER,
+      price_from   INTEGER NOT NULL DEFAULT 0,
+      is_active    INTEGER NOT NULL DEFAULT 1,
+      sort_order   INTEGER NOT NULL DEFAULT 0,
+      created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    INSERT INTO services_new
+      SELECT id, slug, name, CASE category WHEN 'haircuts' THEN 'haircuts' ELSE 'salon' END,
+             description, duration_min, price_cents, price_from, is_active, sort_order, created_at, updated_at
+      FROM services;
+    DROP TABLE services;
+    ALTER TABLE services_new RENAME TO services;
+    `,
+  },
+  // 3: the business has two sides, "barbershop" and "salon". Women's cuts move to the salon.
+  {
+    foreignKeysOff: true,
+    sql: `
+    CREATE TABLE services_new (
+      id           INTEGER PRIMARY KEY,
+      slug         TEXT NOT NULL UNIQUE,
+      name         TEXT NOT NULL,
+      category     TEXT NOT NULL CHECK (category IN ('barbershop', 'salon')),
+      description  TEXT NOT NULL DEFAULT '',
+      duration_min INTEGER,
+      price_cents  INTEGER,
+      price_from   INTEGER NOT NULL DEFAULT 0,
+      is_active    INTEGER NOT NULL DEFAULT 1,
+      sort_order   INTEGER NOT NULL DEFAULT 0,
+      created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+    INSERT INTO services_new
+      SELECT id, slug, name,
+             CASE WHEN category = 'haircuts' AND slug <> 'womens-haircut' THEN 'barbershop' ELSE 'salon' END,
+             description, duration_min, price_cents, price_from, is_active, sort_order, created_at, updated_at
+      FROM services;
+    DROP TABLE services;
+    ALTER TABLE services_new RENAME TO services;
+    `,
+  },
 ];
 
 function migrate(db) {
   const { user_version: version } = db.get('PRAGMA user_version');
   for (let i = version; i < MIGRATIONS.length; i++) {
-    db.tx(() => {
-      db.exec(MIGRATIONS[i]);
-      db.exec(`PRAGMA user_version = ${i + 1}`);
-    });
+    const step = typeof MIGRATIONS[i] === 'string' ? { sql: MIGRATIONS[i] } : MIGRATIONS[i];
+    // Table rebuilds must run with foreign keys off (it can't be toggled inside a transaction).
+    if (step.foreignKeysOff) db.exec('PRAGMA foreign_keys = OFF');
+    try {
+      db.tx(() => {
+        db.exec(step.sql);
+        if (step.foreignKeysOff && db.all('PRAGMA foreign_key_check').length) {
+          throw new Error(`Migration ${i + 1} would break foreign keys`);
+        }
+        db.exec(`PRAGMA user_version = ${i + 1}`);
+      });
+    } finally {
+      if (step.foreignKeysOff) db.exec('PRAGMA foreign_keys = ON');
+    }
   }
 }
 
@@ -222,7 +286,7 @@ function seed(db) {
     if (!db.get('SELECT 1 AS x FROM business_hours LIMIT 1')) {
       for (const h of DEFAULT_HOURS) {
         db.run('INSERT INTO business_hours (day, is_open, open_min, close_min) VALUES (?, ?, ?, ?)', [
-          h.day, 1, h.open, h.close,
+          h.day, h.isOpen, h.open, h.close,
         ]);
       }
     }

@@ -47,7 +47,7 @@ export async function render(ctx) {
                       h('div', null, h('span', { class: 'cell-title' }, u.name, u.id === state.user.id ? ' (you)' : ''), h('span', { class: 'cell-sub' }, u.email)),
                     ),
                   ),
-                  h('td', { 'data-label': 'Role' }, h('span', { class: `badge ${u.role === 'owner' ? 'badge--gold' : 'badge--booked'} badge--plain` }, u.role === 'owner' ? 'Owner' : 'Staff')),
+                  h('td', { 'data-label': 'Role' }, h('span', { class: `badge ${u.role === 'owner' ? 'badge--accent' : 'badge--booked'} badge--plain` }, u.role === 'owner' ? 'Owner' : 'Staff')),
                   h('td', { 'data-label': 'Last sign-in' }, u.lastLoginAt ? fmtTimestamp(u.lastLoginAt) : h('span', { class: 'muted' }, 'Never')),
                   h(
                     'td',

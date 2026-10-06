@@ -50,10 +50,12 @@ function findBrowser() {
   return candidates.find((p) => fs.existsSync(p));
 }
 
+/** A date `offsetDays` from today in shop time, moved to Monday if it lands on a (closed) Sunday. */
 function shopDate(offsetDays) {
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
   const d = new Date(`${today}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + offsetDays);
+  if (d.getUTCDay() === 0) d.setUTCDate(d.getUTCDate() + 1);
   return d.toISOString().slice(0, 10);
 }
 
@@ -88,11 +90,25 @@ async function apiBook(body) {
   return { status: res.status, body: await res.json() };
 }
 
-/** Opens the booking modal and walks to the time step for a service/barber/date. */
-async function bookingToTimes(page, { service, barber, date }) {
-  await page.locator('.service-card', { hasText: service }).locator('[data-book]').click();
-  await page.locator('[data-booking-title]', { hasText: 'Choose a barber' }).waitFor();
-  await page.locator('.option', { hasText: barber }).click();
+/** Signs in to the admin API directly and returns a small request helper. */
+async function adminApi() {
+  const res = await fetch(`${BASE}/api/admin/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(ADMIN) });
+  const { csrf } = await res.json();
+  const cookie = (res.headers.get('set-cookie') || '').split(';')[0];
+  return async (method, p, body) => {
+    const r = await fetch(`${BASE}/api/admin${p}`, { method, headers: { Cookie: cookie, 'X-CSRF-Token': csrf, 'Content-Type': 'application/json' }, body: body && JSON.stringify(body) });
+    return { status: r.status, body: await r.json() };
+  };
+}
+
+/** The service card named exactly `name` — “Men’s Haircut” must not also match “Women’s Haircut”. */
+const serviceCard = (page, name) => page.locator('.service-card').filter({ has: page.getByRole('heading', { name, exact: true }) });
+
+/** Opens the booking modal and walks to the time step for a service/stylist/date. */
+async function bookingToTimes(page, { service, stylist, date }) {
+  await serviceCard(page, service).locator('[data-book]').click();
+  await page.locator('[data-booking-title]', { hasText: 'Choose your stylist' }).waitFor();
+  await page.locator('.option', { hasText: stylist }).click();
   await page.locator('.cal__day[data-date]').first().waitFor();
   for (let i = 0; i < 3 && !(await page.locator(`.cal__day[data-date="${date}"]`).count()); i++) {
     await page.locator('[data-month="1"]').click();
@@ -123,7 +139,7 @@ async function runAxe(page, label, { include = null } = {}) {
 /* ------------------------------------------------------------------ */
 
 async function startServer() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bb-e2e-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mh-e2e-'));
   const child = spawn(process.execPath, ['--disable-warning=ExperimentalWarning', 'server/index.js'], {
     cwd: ROOT,
     env: {
@@ -188,7 +204,7 @@ async function main() {
       await ctx.close();
     });
 
-    await check('SEO: title, description, canonical, Open Graph, one h1, BarberShop schema', async () => {
+    await check('SEO: title, description, canonical, Open Graph, one h1, BarberShop/HairSalon schema', async () => {
       const ctx = await desktop();
       const page = await ctx.newPage();
       await page.goto(BASE);
@@ -208,7 +224,7 @@ async function main() {
       assert(meta.canonical === `${BASE}/`, `canonical ${meta.canonical}`);
       assert(meta.ogTitle && meta.ogImage, 'Open Graph tags');
       assert(meta.h1 === 1, `${meta.h1} h1 elements`);
-      assert(meta.ld['@type'] === 'BarberShop' && meta.ld.address.addressLocality === 'Grande Prairie', 'schema');
+      assert(meta.ld['@type'].includes('BarberShop') && meta.ld['@type'].includes('HairSalon') && meta.ld.address.addressLocality === 'Grande Prairie', 'schema');
       assert(meta.imgsWithoutAlt === 0, `${meta.imgsWithoutAlt} images missing alt`);
       assert(meta.lang === 'en-CA', 'lang');
       const og = await fetch(meta.ogImage.replace(/^https?:\/\/[^/]+/, BASE));
@@ -252,7 +268,7 @@ async function main() {
         } else if (/^https?:/.test(l.href)) {
           assert(l.target === '_blank' && /noopener/.test(l.rel), `external link without target/rel: ${l.href}`);
         } else if (l.href.startsWith('tel:')) {
-          assert(l.href === 'tel:+17805050013', `unexpected phone link ${l.href}`);
+          assert(l.href === 'tel:+17805324678', `unexpected phone link ${l.href}`);
         }
       }
       await ctx.close();
@@ -264,9 +280,9 @@ async function main() {
       const page = await ctx.newPage();
       const problems = watch(page);
       await page.goto(BASE);
-      const trigger = page.locator('.service-card', { hasText: 'Fade Cut' }).locator('[data-book]');
-      await bookingToTimes(page, { service: 'Fade Cut', barber: 'Barber 1', date: dateA });
-      assert((await page.locator('[data-booking-summary]').textContent()).includes('Fade Cut'), 'service carried into summary');
+      const trigger = serviceCard(page, 'Women’s Haircut').locator('[data-book]');
+      await bookingToTimes(page, { service: 'Women’s Haircut', stylist: 'Stylist 1', date: dateA });
+      assert((await page.locator('[data-booking-summary]').textContent()).includes('Women’s Haircut'), 'service carried into summary');
       const slot = page.locator('.slot[data-time]:not([disabled])').first();
       const time = await slot.getAttribute('data-time');
       await slot.click();
@@ -283,11 +299,11 @@ async function main() {
       await page.locator('[data-booking-next]').click();
       assert((await page.locator('#bk-email-err').textContent()).includes('valid email'), 'email validation');
       await page.fill('#bk-email', 'taylor@example.com');
-      await page.fill('#bk-notes', 'Low skin fade please');
+      await page.fill('#bk-notes', 'Just a trim, please');
       await page.locator('[data-booking-next]').click();
-      await page.locator('.confirm__title', { hasText: 'Appointment Confirmed' }).waitFor();
+      await page.locator('.confirm__title', { hasText: 'Appointment confirmed' }).waitFor();
       const text = await page.locator('.confirm').textContent();
-      assert(/BB-[A-Z0-9]{6}/.test(text) && text.includes('Barber 1') && text.includes('Taylor Brooks'), 'confirmation details');
+      assert(/MH-[A-Z0-9]{6}/.test(text) && text.includes('Stylist 1') && text.includes('Taylor Brooks'), 'confirmation details');
       const ics = await page.locator('.confirm a[download]').getAttribute('href');
       assert((await fetch(`${BASE}${ics}`)).ok, 'calendar file downloadable');
 
@@ -295,7 +311,7 @@ async function main() {
       await page.waitForFunction(() => !document.querySelector('[data-booking]').open);
       assert(await trigger.evaluate((el) => el === document.activeElement), 'focus returns to the Book Now that opened it');
 
-      // The same slot is now unavailable for that barber.
+      // The same slot is now unavailable for that stylist.
       const slots = await (await fetch(`${BASE}/api/availability/slots?serviceId=2&barberId=1&date=${dateA}`)).json();
       assert(slots.slots.find((s) => s.time === time).available === false, 'slot is taken after booking');
       assert(!problems.length, problems.join('\n'));
@@ -309,7 +325,7 @@ async function main() {
       const ctx = await desktop();
       const page = await ctx.newPage();
       await page.goto(BASE);
-      await bookingToTimes(page, { service: 'Custom Cut', barber: 'Barber 1', date: dateB });
+      await bookingToTimes(page, { service: 'Men’s Haircut', stylist: 'Stylist 1', date: dateB });
       const taken = page.locator('.slot[data-time="10:00"]');
       assert(await taken.isDisabled(), '10:00 is disabled');
       assert((await taken.getAttribute('aria-label')).includes('unavailable'), 'announced as unavailable');
@@ -321,11 +337,11 @@ async function main() {
       const ctx = await desktop();
       const page = await ctx.newPage();
       await page.goto(BASE);
-      await bookingToTimes(page, { service: 'Custom Cut', barber: 'Barber 2', date: dateC });
+      await bookingToTimes(page, { service: 'Men’s Haircut', stylist: 'Stylist 2', date: dateC });
       const slot = page.locator('.slot[data-time="15:00"]');
       await slot.click();
       await page.locator('#bk-name').waitFor();
-      // Another customer books 3 PM with Barber 2 in the meantime.
+      // Another customer books 3 PM with Stylist 2 in the meantime.
       const other = await apiBook({ serviceId: 1, barberId: 2, date: dateC, time: '15:00', name: 'Fast Finger', phone: '7805550902', email: 'fast@example.com' });
       assert(other.status === 201, 'competing booking');
       await page.fill('#bk-name', 'Slow Poke');
@@ -346,8 +362,8 @@ async function main() {
       // Calendar request fails once → error state with retry.
       let failCalendar = true;
       await page.route('**/api/availability/calendar**', (route) => (failCalendar ? route.abort() : route.continue()));
-      await page.locator('.service-card', { hasText: 'Buzz Cut' }).locator('[data-book]').click();
-      await page.locator('.option', { hasText: 'Any available barber' }).click();
+      await serviceCard(page, 'Hair Styling').locator('[data-book]').click();
+      await page.locator('.option', { hasText: 'Any available stylist' }).click();
       await page.locator('.state', { hasText: 'Couldn’t load availability' }).waitFor();
       assert(await page.locator('[data-retry]').isVisible(), 'retry button shown');
       failCalendar = false;
@@ -373,11 +389,11 @@ async function main() {
       const toggle = page.locator('[data-nav-toggle]');
       await toggle.click();
       assert((await toggle.getAttribute('aria-expanded')) === 'true', 'menu expanded');
-      await page.locator('[data-mobile-menu] a', { hasText: 'Services' }).click();
+      await page.locator('[data-mobile-menu] a', { hasText: 'Salon' }).click();
       await page.waitForTimeout(500);
       assert((await toggle.getAttribute('aria-expanded')) === 'false', 'menu closes after navigation');
       assert(await page.locator('.site-header__call').isVisible(), 'header call button visible');
-      assert((await page.locator('.site-header__call').getAttribute('href')) === 'tel:+17805050013', 'click-to-call');
+      assert((await page.locator('.site-header__call').getAttribute('href')) === 'tel:+17805324678', 'click-to-call');
 
       await page.evaluate(() => window.scrollTo(0, 1600));
       await page.waitForTimeout(700);
@@ -421,6 +437,26 @@ async function main() {
       await ctx.close();
     });
 
+    await check('Google rating stays hidden until the owner adds it, then shows everywhere', async () => {
+      const ctx = await auditable();
+      const page = await ctx.newPage();
+      await page.goto(BASE);
+      assert(!(await page.locator('.trust__score').count()), 'no rating block before one is added');
+      assert(!(await page.locator('.stars').count()), 'no star ratings before one is added');
+      assert(await page.locator('.reviews__summary--plain').count(), 'plain reviews link instead');
+      await scrollThrough(page);
+      await runAxe(page, 'home without a rating');
+
+      const api = await adminApi();
+      const { body } = await api('GET', '/business');
+      const saved = await api('PUT', '/business', { ...body.business, googleRating: '4.8', googleReviewCount: '120' });
+      assert(saved.status === 200, `save rating ${saved.status}`);
+      await page.reload();
+      assert(await page.locator('.trust__score').isVisible(), 'rating block shown');
+      assert((await page.locator('.hero__badge').textContent()).includes('120+ Google reviews'), 'hero badge shows the rating');
+      await ctx.close();
+    });
+
     await check('reduced motion: all content visible without animation', async () => {
       const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, reducedMotion: 'reduce' });
       const page = await ctx.newPage();
@@ -447,19 +483,20 @@ async function main() {
       await ctx.close();
     });
 
-    await check('services tabs and gallery filter + lightbox', async () => {
+    await check('services split into barbershop and salon, gallery filter + lightbox', async () => {
       const ctx = await desktop();
       const page = await ctx.newPage();
       await page.goto(BASE);
-      await page.locator('#tab-beard-grooming').click();
-      assert(await page.locator('#panel-beard-grooming').isVisible(), 'beard panel visible');
-      assert(!(await page.locator('#panel-haircuts').isVisible()), 'haircuts hidden');
-      await page.keyboard.press('ArrowLeft');
-      assert(await page.locator('#panel-haircuts').isVisible(), 'arrow keys switch tabs');
+      const sides = await page.locator('.side__title').allTextContents();
+      assert(sides.join('|') === 'The Barbershop|The Salon', `sides: ${sides.join(' | ')}`);
+      assert((await page.locator('#barbershop .service-card').count()) === 1, 'barbershop services');
+      assert((await page.locator('#salon .service-card').count()) === 4, 'salon services');
+      await page.locator('.hero-side--salon').click();
+      await page.waitForFunction(() => Math.abs(document.getElementById('salon').getBoundingClientRect().top) < 140);
 
-      await page.locator('[data-filter="beard"]').click();
+      await page.locator('[data-filter="color"]').click();
       const visible = await page.locator('.gallery__item:not([hidden])').count();
-      assert(visible === 3, `${visible} beard photos shown`);
+      assert(visible === 3, `${visible} color photos shown`);
       await page.locator('.gallery__item:not([hidden]) .gallery__btn').first().click();
       const img = page.locator('[data-lightbox-img]');
       await img.waitFor();
@@ -535,7 +572,7 @@ async function main() {
       const dateE = shopDate(2);
       await page.locator('.topbar .btn--primary', { hasText: 'New appointment' }).click();
       const modalEl = page.locator('dialog.modal[open]');
-      await modalEl.locator('select[name=barberId]').selectOption({ label: 'Barber 2' });
+      await modalEl.locator('select[name=barberId]').selectOption({ label: 'Stylist 2' });
       await modalEl.locator('input[name=date]').fill(dateE);
       await modalEl.locator('input[name=date]').dispatchEvent('change');
       await modalEl.locator('.time-chip:not([disabled])').first().waitFor();
@@ -569,7 +606,7 @@ async function main() {
       await page.click('button[type=submit]');
       await page.locator('.stats').waitFor();
       await page.evaluate(() => (location.hash = '#/services'));
-      await page.locator('tr', { hasText: 'Beard Trim' }).locator('button', { hasText: 'Edit' }).click();
+      await page.locator('tr', { hasText: 'Facial Waxing' }).locator('button', { hasText: 'Edit' }).click();
       const m = page.locator('dialog.modal[open]');
       await m.locator('input[name=price]').fill('25');
       await m.locator('input[name=durationMin]').fill('20');
@@ -577,7 +614,8 @@ async function main() {
       await page.locator('.toast', { hasText: 'Service saved' }).waitFor();
 
       const site = await (await fetch(BASE)).text();
-      assert(/Beard Trim<\/h3>[\s\S]{0,400}?/.test(site) && site.includes('$25') && site.includes('20 min'), 'price and duration on the site');
+      const card = site.split('<article class="service-card"').find((c) => c.includes('Facial Waxing</h4>'));
+      assert(card && card.includes('$25') && card.includes('20 min'), 'price and duration on the site');
       await ctx.close();
     });
   } finally {

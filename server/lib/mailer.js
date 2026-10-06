@@ -56,44 +56,47 @@ const escapeHtml = (s) =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 function emailShell(business, title, bodyHtml) {
-  const address = `${business.streetAddress}, ${business.city}, ${business.region} ${business.postalCode}`;
-  return `<!doctype html><html><body style="margin:0;background:#f1ece3;font-family:Helvetica,Arial,sans-serif;color:#151412">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1ece3;padding:32px 12px">
+  const address = `${business.building ? `${business.building}, ` : ''}${business.streetAddress}, ${business.city}, ${business.region} ${business.postalCode}`;
+  return `<!doctype html><html><body style="margin:0;background:#f3f5f9;font-family:Helvetica,Arial,sans-serif;color:#111827">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f5f9;padding:32px 12px">
 <tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;overflow:hidden">
-<tr><td style="background:#0c0c0d;padding:28px 32px;text-align:center">
-<div style="color:#f2eee6;font-size:20px;font-weight:800;letter-spacing:4px">BROTHERS</div>
-<div style="color:#c9a46a;font-size:11px;letter-spacing:5px;margin-top:4px">BARBER SHOP</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #e5e7eb">
+<tr><td style="padding:24px 32px;border-bottom:1px solid #e5e7eb">
+<table role="presentation" cellpadding="0" cellspacing="0"><tr>
+<td style="width:38px;height:38px;background:#2f5bff;border-radius:11px;color:#ffffff;font-size:20px;font-weight:800;text-align:center;line-height:38px">M</td>
+<td style="padding-left:12px"><div style="color:#111827;font-size:18px;font-weight:800;letter-spacing:-0.3px">Manhandler</div>
+<div style="color:#5f6878;font-size:10px;font-weight:700;letter-spacing:2.5px;margin-top:2px">BARBERSHOP &amp; SALON</div></td>
+</tr></table>
 </td></tr>
 <tr><td style="padding:32px">
-<h1 style="margin:0 0 16px;font-size:22px;color:#151412">${escapeHtml(title)}</h1>
+<h1 style="margin:0 0 16px;font-size:24px;color:#111827;letter-spacing:-0.5px">${escapeHtml(title)}</h1>
 ${bodyHtml}
 </td></tr>
-<tr><td style="padding:20px 32px;background:#faf8f4;color:#6b655c;font-size:12px;line-height:1.6;text-align:center">
+<tr><td style="padding:20px 32px;background:#f8fafc;color:#5f6878;font-size:12px;line-height:1.6;text-align:center">
 ${escapeHtml(business.name)} · ${escapeHtml(address)}<br>
-<a href="tel:${escapeHtml(business.phone.replace(/[^\d+]/g, ''))}" style="color:#9a7438">${escapeHtml(business.phone)}</a>
+<a href="tel:${escapeHtml(business.phone.replace(/[^\d+]/g, ''))}" style="color:#2448e8">${escapeHtml(business.phone)}</a>
 </td></tr>
 </table></td></tr></table></body></html>`;
 }
 
 function detailRows(rows) {
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #ece6db;margin:8px 0 24px">
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e5e7eb;margin:8px 0 24px">
 ${rows
   .map(
-    ([k, v]) => `<tr><td style="padding:10px 0;border-bottom:1px solid #ece6db;color:#6b655c;font-size:14px;width:38%">${escapeHtml(k)}</td>
-<td style="padding:10px 0;border-bottom:1px solid #ece6db;font-size:14px;font-weight:600">${escapeHtml(v)}</td></tr>`,
+    ([k, v]) => `<tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb;color:#5f6878;font-size:14px;width:38%">${escapeHtml(k)}</td>
+<td style="padding:10px 0;border-bottom:1px solid #e5e7eb;font-size:14px;font-weight:600">${escapeHtml(v)}</td></tr>`,
   )
   .join('')}
 </table>`;
 }
 
-const button = (href, label) =>
-  `<a href="${escapeHtml(href)}" style="display:inline-block;background:#c9a46a;color:#15110a;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:1.5px;padding:14px 22px;border-radius:6px;margin:0 8px 8px 0">${escapeHtml(label)}</a>`;
+const button = (href, label, secondary = false) =>
+  `<a href="${escapeHtml(href)}" style="display:inline-block;background:${secondary ? '#ebf0ff' : '#2f5bff'};color:${secondary ? '#2448e8' : '#ffffff'};text-decoration:none;font-weight:700;font-size:14px;padding:14px 24px;border-radius:999px;margin:0 8px 8px 0">${escapeHtml(label)}</a>`;
 
 function apptRows(appt) {
   return [
     ['Service', appt.serviceName],
-    ['Barber', appt.barberName],
+    ['Stylist', appt.barberName],
     ['Date', formatDateLong(appt.date)],
     ['Time', formatTime12(appt.startMin)],
     ['Reference', appt.reference],
@@ -114,7 +117,7 @@ export function confirmationEmail(appt, business, siteUrl) {
       '',
       ...apptRows(appt).map(([k, v]) => `${k}: ${v}`),
       '',
-      `Address: ${business.streetAddress}, ${business.city}, ${business.region} ${business.postalCode}`,
+      `Address: ${business.building ? `${business.building}, ` : ''}${business.streetAddress}, ${business.city}, ${business.region} ${business.postalCode}`,
       `Phone: ${business.phone}`,
       '',
       `Add to your calendar: ${ics}`,
@@ -127,8 +130,8 @@ export function confirmationEmail(appt, business, siteUrl) {
       'Appointment confirmed',
       `<p style="margin:0 0 8px;font-size:15px;line-height:1.6">Hi ${escapeHtml(first)}, you’re all set. Here are your booking details:</p>
 ${detailRows(apptRows(appt))}
-<p style="margin:0 0 24px">${button(ics, 'ADD TO CALENDAR')}${button(manage, 'MANAGE BOOKING')}</p>
-<p style="margin:0;font-size:13px;color:#6b655c;line-height:1.6">Need to cancel or change your appointment? Use the link above or call us at ${escapeHtml(business.phone)}.</p>`,
+<p style="margin:0 0 24px">${button(ics, 'Add to calendar')}${button(manage, 'Manage booking', true)}</p>
+<p style="margin:0;font-size:13px;color:#5f6878;line-height:1.6">Need to cancel or change your appointment? Use the link above or call us at ${escapeHtml(business.phone)}.</p>`,
     ),
   };
 }
@@ -152,7 +155,7 @@ export function cancellationEmail(appt, business, siteUrl) {
       'Appointment cancelled',
       `<p style="margin:0 0 8px;font-size:15px;line-height:1.6">Hi ${escapeHtml(first)}, this appointment has been cancelled:</p>
 ${detailRows(apptRows(appt))}
-<p style="margin:0 0 8px">${button(`${siteUrl}/book`, 'BOOK AGAIN')}</p>`,
+<p style="margin:0 0 8px">${button(`${siteUrl}/book`, 'Book again')}</p>`,
     ),
   };
 }
@@ -169,7 +172,7 @@ export function shopNotificationEmail(appt, business, siteUrl, kind = 'new') {
   return {
     subject: `${label}: ${appt.customer.name} — ${appt.serviceName}, ${formatDateLong(appt.date)} ${formatTime12(appt.startMin)}`,
     text: [`${label}`, '', ...rows.map(([k, v]) => `${k}: ${v}`), '', `Dashboard: ${siteUrl}/admin`].join('\n'),
-    html: emailShell(business, label, `${detailRows(rows)}<p style="margin:0">${button(`${siteUrl}/admin`, 'OPEN DASHBOARD')}</p>`),
+    html: emailShell(business, label, `${detailRows(rows)}<p style="margin:0">${button(`${siteUrl}/admin`, 'Open dashboard')}</p>`),
   };
 }
 

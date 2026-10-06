@@ -5,7 +5,7 @@
  * Netlify only serves files — it can't run the Node booking server or keep its
  * database. So this script has two modes:
  *
- *  • BACKEND_URL set (e.g. https://brothers-barber.onrender.com):
+ *  • BACKEND_URL set (e.g. https://manhandler.onrender.com):
  *      Netlify forwards every request to the Node server, so the full site,
  *      booking and dashboard all work on the Netlify address.
  *
@@ -47,7 +47,7 @@ fs.cpSync(config.publicDir, OUT, { recursive: true });
 const statics = createStaticHandler(config.publicDir);
 const site = {
   business: DEFAULT_BUSINESS,
-  hours: DEFAULT_HOURS.map((h) => ({ day: h.day, isOpen: true, open: h.open, close: h.close })),
+  hours: DEFAULT_HOURS.map((h) => ({ day: h.day, isOpen: h.isOpen, open: h.open, close: h.close })),
   services: SEED_SERVICES.map((s, i) => ({ ...s, id: i + 1, durationMin: null, priceCents: null, priceFrom: false, isActive: true, sortOrder: (i + 1) * 10 })),
   barbers: SEED_BARBERS.map((name, i) => ({ id: i + 1, name, title: '', workDays: [0, 1, 2, 3, 4, 5, 6], isActive: true })),
   reviews: [],

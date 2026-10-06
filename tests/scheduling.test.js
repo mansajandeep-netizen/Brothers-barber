@@ -35,14 +35,17 @@ describe('availability', () => {
     assert.equal(times(res).at(-1), '18:30'); // 30-min default length, closes 7 PM
   });
 
-  test('Sunday uses Sunday hours (9 AM – 5 PM)', () => {
-    const res = slotsOf({ date: '2026-10-11' });
-    assert.equal(times(res)[0], '09:00');
-    assert.equal(times(res).at(-1), '16:30');
+  test('Saturday closes at 6 PM and Sunday is closed', () => {
+    const sat = slotsOf({ date: '2026-10-10' });
+    assert.equal(times(sat)[0], '10:00');
+    assert.equal(times(sat).at(-1), '17:30');
+    const sun = slotsOf({ date: '2026-10-11' });
+    assert.equal(sun.open, false);
+    assert.equal(sun.slots.length, 0);
   });
 
   test('past dates and dates beyond the booking window are not bookable', () => {
-    assert.equal(slotsOf({ date: '2026-10-04' }).open, false);
+    assert.equal(slotsOf({ date: '2026-10-03' }).open, false); // last Saturday
     assert.equal(slotsOf({ date: '2026-11-10' }).open, false);
   });
 
@@ -55,8 +58,8 @@ describe('availability', () => {
   });
 
   test('a longer service blocks the overlapping half-hours', () => {
-    const fade = t.store.services.get(2);
-    t.store.services.update(2, { ...fade, durationMin: 60 });
+    const svc = t.store.services.get(2);
+    t.store.services.update(2, { ...svc, durationMin: 60 });
     t.scheduler.book({ serviceId: 2, barberId: 1, date: '2026-10-06', time: '13:00', customer: customer() });
     const res = t.scheduler.slotsFor({ serviceId: 1, barberId: 1, date: '2026-10-06' });
     const byTime = Object.fromEntries(res.slots.map((s) => [s.time, s.available]));
@@ -68,7 +71,7 @@ describe('availability', () => {
     assert.equal(times(t.scheduler.slotsFor({ serviceId: 2, barberId: 2, date: '2026-10-06' })).at(-1), '18:00');
   });
 
-  test('shop-wide and per-barber blocks remove times', () => {
+  test('shop-wide and per-stylist blocks remove times', () => {
     t.store.blocks.create({ barberId: null, dateFrom: '2026-10-08', dateTo: '2026-10-08', allDay: false, startMin: 720, endMin: 780, reason: 'Lunch' });
     const shop = slotsOf({ date: '2026-10-08' });
     assert.ok(!times(shop).includes('12:00'));
@@ -77,10 +80,10 @@ describe('availability', () => {
 
     t.store.blocks.create({ barberId: 1, dateFrom: '2026-10-09', dateTo: '2026-10-10', allDay: true, reason: 'Vacation' });
     assert.equal(times(t.scheduler.slotsFor({ serviceId: 1, barberId: 1, date: '2026-10-09' })).length, 0);
-    assert.ok(times(slotsOf({ date: '2026-10-09' })).length > 0, 'another barber is still available');
+    assert.ok(times(slotsOf({ date: '2026-10-09' })).length > 0, 'another stylist is still available');
   });
 
-  test('barbers are only offered on the days they work', () => {
+  test('stylists are only offered on the days they work', () => {
     const b2 = t.store.barbers.get(2);
     t.store.barbers.update(2, { ...b2, workDays: [0, 1, 3, 4, 5, 6] }); // off Tuesdays
     const res = t.scheduler.slotsFor({ serviceId: 1, barberId: 2, date: '2026-10-06' });
@@ -91,12 +94,16 @@ describe('availability', () => {
     const cal = t.scheduler.calendar({ serviceId: 1, from: '2026-10-01', to: '2026-10-31' });
     assert.equal(cal.today, '2026-10-05');
     assert.equal(cal.days[0].date, '2026-10-05', 'past days are excluded');
-    assert.ok(cal.days.every((d) => d.open && d.available > 0));
+    for (const d of cal.days) {
+      const sunday = new Date(`${d.date}T12:00:00Z`).getUTCDay() === 0;
+      assert.equal(d.open, !sunday, `${d.date} open`);
+      assert.equal(d.available > 0, !sunday, `${d.date} has times`);
+    }
   });
 });
 
 describe('booking', () => {
-  test('"any barber" spreads bookings and the slot closes when everyone is booked', () => {
+  test('"any stylist" spreads bookings and the slot closes when everyone is booked', () => {
     const a = t.scheduler.book({ serviceId: 1, date: '2026-10-06', time: '10:00', customer: customer(1) });
     const b = t.scheduler.book({ serviceId: 1, date: '2026-10-06', time: '10:00', customer: customer(2) });
     assert.notEqual(a.barberId, b.barberId);
@@ -108,7 +115,7 @@ describe('booking', () => {
     assert.equal(slot.available, false);
   });
 
-  test('the same barber can never be double-booked', () => {
+  test('the same stylist can never be double-booked', () => {
     t.scheduler.book({ serviceId: 1, barberId: 1, date: '2026-10-06', time: '11:00', customer: customer(1) });
     assert.throws(
       () => t.scheduler.book({ serviceId: 1, barberId: 1, date: '2026-10-06', time: '11:00', customer: customer(2) }),
@@ -129,8 +136,8 @@ describe('booking', () => {
   });
 
   test('returning customers are matched by phone number', () => {
-    const a = t.scheduler.book({ serviceId: 1, barberId: 1, date: '2026-10-06', time: '09:00', customer: { name: 'Sam Lee', phone: '(780) 555-0101', email: 'sam@example.com' } });
-    const b = t.scheduler.book({ serviceId: 1, barberId: 1, date: '2026-10-07', time: '09:00', customer: { name: 'Sam Lee', phone: '+1 780-555-0101', email: 'sam@example.com' } });
+    const a = t.scheduler.book({ serviceId: 1, barberId: 1, date: '2026-10-06', time: '10:00', customer: { name: 'Sam Lee', phone: '(780) 555-0101', email: 'sam@example.com' } });
+    const b = t.scheduler.book({ serviceId: 1, barberId: 1, date: '2026-10-07', time: '10:00', customer: { name: 'Sam Lee', phone: '+1 780-555-0101', email: 'sam@example.com' } });
     assert.equal(a.customer.id, b.customer.id);
   });
 

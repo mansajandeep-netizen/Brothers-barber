@@ -58,13 +58,14 @@ export async function startTestServer() {
   };
 }
 
-/** Next date (YYYY-MM-DD, shop time) at least `minDays` ahead that falls on the given weekday. */
+/** Next day the shop is open (YYYY-MM-DD, shop time) at least `minDays` ahead, optionally on a given weekday. */
 export function upcomingDate(store, minDays = 2, weekday = null) {
   const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Edmonton', year: 'numeric', month: '2-digit', day: '2-digit' });
   const today = fmt.format(new Date());
+  const openDays = new Set(store.hours.list().filter((h) => h.isOpen).map((h) => h.day));
   const d = new Date(`${today}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() + minDays);
-  while (weekday != null && d.getUTCDay() !== weekday) d.setUTCDate(d.getUTCDate() + 1);
+  while (!openDays.has(d.getUTCDay()) || (weekday != null && d.getUTCDay() !== weekday)) d.setUTCDate(d.getUTCDate() + 1);
   return d.toISOString().slice(0, 10);
 }
 

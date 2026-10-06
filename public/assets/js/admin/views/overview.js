@@ -42,7 +42,7 @@ export async function render(ctx) {
     stat("Today's appointments", s.today, s.todayCompleted ? `${s.todayCompleted} completed · ${remaining} still to come` : `${remaining} still to come`, 'calendar', true),
     stat('Upcoming', s.upcoming, 'booked from now on', 'clock'),
     stat('Total bookings', s.total, `${s.customers} customer${s.customers === 1 ? '' : 's'}`, 'users'),
-    stat('Open slots today', s.openSlotsToday, `across ${state.barbers.filter((b) => b.isActive).length} barber${state.barbers.filter((b) => b.isActive).length === 1 ? '' : 's'}`, 'check'),
+    stat('Open slots today', s.openSlotsToday, `across ${state.barbers.filter((b) => b.isActive).length} stylist${state.barbers.filter((b) => b.isActive).length === 1 ? '' : 's'}`, 'check'),
   );
 
   const notices = [];

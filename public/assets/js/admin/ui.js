@@ -50,15 +50,15 @@ export function logoMark() {
   svg.setAttribute('viewBox', '0 0 40 40');
   svg.setAttribute('aria-hidden', 'true');
   const rect = document.createElementNS(SVG, 'rect');
-  Object.entries({ x: 1, y: 1, width: 38, height: 38, rx: 3 }).forEach(([k, v]) => rect.setAttribute(k, v));
+  Object.entries({ x: 0, y: 0, width: 40, height: 40, rx: 11 }).forEach(([k, v]) => rect.setAttribute(k, v));
   const path = document.createElementNS(SVG, 'path');
-  path.setAttribute('d', 'M14 11v18M14 11h7.2a4.4 4.4 0 0 1 0 8.8H14m0 0h8.4a4.6 4.6 0 0 1 0 9.2H14');
+  path.setAttribute('d', 'M12.5 28V12.5l7.5 9 7.5-9V28');
   svg.append(rect, path);
   return svg;
 }
 
 export const brand = () =>
-  h('span', { class: 'brand' }, logoMark(), h('span', null, h('span', { class: 'brand__name' }, 'Brothers'), h('span', { class: 'brand__sub' }, 'Barber Shop')));
+  h('span', { class: 'brand' }, logoMark(), h('span', null, h('span', { class: 'brand__name' }, 'Manhandler'), h('span', { class: 'brand__sub' }, 'Barbershop & Salon')));
 
 export const initials = (name = '') =>
   name

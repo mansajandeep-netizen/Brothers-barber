@@ -1,6 +1,7 @@
 import { DAY_NAMES, DAY_SHORT, formatTime12, minutesToTime } from '../lib/time.js';
 
-export const fullAddress = (b) => `${b.streetAddress}, ${b.city}, ${b.region} ${b.postalCode}`;
+export const fullAddress = (b) =>
+  `${b.building ? `${b.building}, ` : ''}${b.streetAddress}, ${b.city}, ${b.region} ${b.postalCode}`;
 
 export function telHref(phone) {
   const digits = String(phone).replace(/\D/g, '');

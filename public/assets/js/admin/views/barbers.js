@@ -2,7 +2,7 @@ import { get, post, patch, del } from '../api.js';
 import { isOwner, loadCatalog } from '../state.js';
 import { h, icon, button, empty, modal, confirmDialog, field, switchField, readForm, showFieldErrors, withBusy, toast, initials, DAY_SHORT, WEEK_ORDER } from '../ui.js';
 
-const PLACEHOLDER = /^Barber \d+$/;
+const PLACEHOLDER = /^(Barber|Stylist) \d+$/;
 
 export async function render(ctx) {
   const { el, setActions } = ctx;
@@ -13,18 +13,18 @@ export async function render(ctx) {
     await loadCatalog();
     ctx.refresh();
   };
-  if (owner) setActions(button('Add barber', { variant: 'secondary', size: 'sm', iconName: 'plus', onClick: () => openEditor(null, barbers.length, reload) }));
+  if (owner) setActions(button('Add stylist', { variant: 'secondary', size: 'sm', iconName: 'plus', onClick: () => openEditor(null, barbers.length, reload) }));
 
   const hasPlaceholders = barbers.some((b) => PLACEHOLDER.test(b.name));
 
   el.replaceChildren(
-    h('div', { class: 'page__head' }, h('div', null, h('h2', null, 'Barbers'), h('p', null, 'Who customers can book with, and which days each barber works.'))),
+    h('div', { class: 'page__head' }, h('div', null, h('h2', null, 'Stylists'), h('p', null, 'Who customers can book with, and which days each stylist works.'))),
     hasPlaceholders
       ? h(
           'div',
           { class: 'alert alert--warn', style: { marginBottom: '16px' } },
           icon('info'),
-          h('p', null, h('strong', null, 'Placeholder names in use. '), 'Customers see these names when booking — rename each chair to the real barber (or remove extras).'),
+          h('p', null, h('strong', null, 'Placeholder names in use. '), 'Customers see these names when booking — rename each chair to the real stylist (or remove extras).'),
         )
       : null,
     barbers.length
@@ -59,8 +59,8 @@ export async function render(ctx) {
                       onClick: async () => {
                         const ok = await confirmDialog({
                           title: `Remove ${b.name}?`,
-                          message: 'They’ll no longer appear for booking. Past appointments are kept. Barbers with upcoming appointments can’t be removed until those are moved or cancelled.',
-                          confirmLabel: 'Remove barber',
+                          message: 'They’ll no longer appear for booking. Past appointments are kept. Stylists with upcoming appointments can’t be removed until those are moved or cancelled.',
+                          confirmLabel: 'Remove stylist',
                           danger: true,
                         });
                         if (!ok) return;
@@ -78,7 +78,7 @@ export async function render(ctx) {
             ),
           ),
         )
-      : h('div', { class: 'card' }, empty({ iconName: 'user', title: 'No barbers yet', text: 'Add at least one barber to accept bookings.' })),
+      : h('div', { class: 'card' }, empty({ iconName: 'user', title: 'No stylists yet', text: 'Add at least one stylist to accept bookings.' })),
   );
 }
 
@@ -94,8 +94,8 @@ function openEditor(barber, count, onDone) {
   const form = h(
     'form',
     { class: 'form', novalidate: true },
-    h('div', { class: 'form-row form-row--2' }, field({ label: 'Name', name: 'name', value: b?.name ?? '', attrs: { maxlength: 60 } }), field({ label: 'Title (optional)', name: 'title', value: b?.title ?? '', attrs: { maxlength: 80, placeholder: 'e.g. Senior Barber' } })),
-    h('div', { class: 'field', dataset: { field: 'workDays' } }, h('span', { class: 'field__label' }, 'Works on'), days, h('p', { class: 'field__hint' }, 'Online booking only offers days this barber works and the shop is open.'), h('p', { class: 'field__error', hidden: true })),
+    h('div', { class: 'form-row form-row--2' }, field({ label: 'Name', name: 'name', value: b?.name ?? '', attrs: { maxlength: 60 } }), field({ label: 'Title (optional)', name: 'title', value: b?.title ?? '', attrs: { maxlength: 80, placeholder: 'e.g. Barber, Stylist, Colorist' } })),
+    h('div', { class: 'field', dataset: { field: 'workDays' } }, h('span', { class: 'field__label' }, 'Works on'), days, h('p', { class: 'field__hint' }, 'Online booking only offers days this stylist works and the shop is open.'), h('p', { class: 'field__error', hidden: true })),
     h(
       'div',
       { class: 'form-row form-row--2' },
@@ -103,8 +103,8 @@ function openEditor(barber, count, onDone) {
       field({ label: 'Sort order', name: 'sortOrder', type: 'number', value: b?.sortOrder ?? (count + 1) * 10, attrs: { min: 0, step: 10 } }),
     ),
   );
-  const save = button(b ? 'Save' : 'Add barber', { variant: 'primary', onClick: () => submit() });
-  const m = modal({ title: b ? `Edit ${b.name}` : 'Add a barber', body: form, actions: [button('Cancel', { variant: 'ghost', onClick: () => m.close() }), save] });
+  const save = button(b ? 'Save' : 'Add stylist', { variant: 'primary', onClick: () => submit() });
+  const m = modal({ title: b ? `Edit ${b.name}` : 'Add a stylist', body: form, actions: [button('Cancel', { variant: 'ghost', onClick: () => m.close() }), save] });
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     submit();
@@ -117,7 +117,7 @@ function openEditor(barber, count, onDone) {
       try {
         if (b) await patch(`/barbers/${b.id}`, body);
         else await post('/barbers', body);
-        toast(b ? 'Barber saved.' : 'Barber added.');
+        toast(b ? 'Stylist saved.' : 'Stylist added.');
         m.close();
         onDone();
       } catch (err) {
