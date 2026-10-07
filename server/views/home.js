@@ -13,6 +13,7 @@ import {
   weekHours,
 } from './format.js';
 import { CATEGORIES } from '../seed-data.js';
+import { combArt, dropsArt, dryerArt, poleArt, scissorsArt, serviceArt, sparklesArt } from './art.js';
 
 const GALLERY_LABELS = {
   mens: 'Men’s cuts',
@@ -45,9 +46,22 @@ function openDaysLabel(hours) {
   return contiguous ? `${week[first].name} to ${week[last].name}` : `${open.length} days a week`;
 }
 
-const serviceIcon = (s) =>
-  ({ 'hair-styling': 'comb', 'hair-coloring': 'droplet', 'facial-waxing': 'sparkles' })[s.slug] ??
-  (/cut|trim|fade|shave/i.test(s.name) ? 'scissors' : 'sparkles');
+/** Colour and animated illustration for each service; services added later fall back by name. */
+const SERVICE_LOOK = {
+  'mens-haircut': { tone: 'blue', art: 'scissors' },
+  'womens-haircut': { tone: 'pink', art: 'scissors' },
+  'hair-styling': { tone: 'violet', art: 'dryer' },
+  'hair-coloring': { tone: 'coral', art: 'drops' },
+  'facial-waxing': { tone: 'mint', art: 'sparkles' },
+};
+const serviceLook = (s) =>
+  SERVICE_LOOK[s.slug] ?? (/cut|trim|fade|shave/i.test(s.name) ? { tone: 'blue', art: 'scissors' } : { tone: 'violet', art: 'sparkles' });
+
+/** Full-bleed decorative background photo; site.js drifts it slowly as the page scrolls. */
+const bgPhoto = (name, { eager = false } = {}) => html`<div class="bg-photo bg-photo--${name}" aria-hidden="true" data-parallax-bg>
+  <img src="/images/bg-${name}-960.webp" srcset="/images/bg-${name}-960.webp 960w, /images/bg-${name}-1600.webp 1600w" sizes="100vw"
+    width="1600" height="900" alt="" decoding="async"${eager ? '' : raw(' loading="lazy"')}>
+</div>`;
 
 /** Copy and photos for the two sides of the business (keys match the service categories). */
 const SIDES = {
@@ -57,7 +71,7 @@ const SIDES = {
     tagline: 'Men’s cuts &amp; styling',
     text: 'Classic and modern men’s cuts with traditional and trendy styling. Walk in, pull a ticket and take a seat.',
     points: ['Classic &amp; modern cuts', 'Traditional &amp; trendy styling', 'Walk-ins welcome'],
-    hero: { src: 'hero', sizes: [480, 800, 1200], alt: 'Barber styling a client’s haircut' },
+    hero: { src: 'hero', sizes: [480, 800, 1200], alt: 'Sharp skin fade with a textured top' },
     alt: 'Barber detailing a high fade with a trimmer',
   },
   salon: {
@@ -66,8 +80,8 @@ const SIDES = {
     tagline: 'Cuts, color &amp; waxing',
     text: 'Women’s cuts and restyles, styling for every occasion, color and facial waxing, all with high-quality professional products.',
     points: ['Women’s cuts &amp; restyles', 'Color &amp; facial waxing', 'Professional products'],
-    hero: { src: 'hero-salon', sizes: [480, 800], alt: 'Stylist cutting a client’s long hair' },
-    alt: 'Bright salon stations with round mirrors',
+    hero: { src: 'hero-salon', sizes: [480, 800], alt: 'Vivid pink hair swinging in motion' },
+    alt: 'Stylist painting hair color onto foils',
   },
 };
 
@@ -75,7 +89,17 @@ function hero(site) {
   const b = site.business;
   return html`
 <section class="hero" id="top" aria-labelledby="hero-title">
+  ${bgPhoto('hero', { eager: true })}
   <div class="hero__glow" aria-hidden="true"></div>
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="hero__floaters" aria-hidden="true">
+    <span class="floater floater--1">${scissorsArt()}</span>
+    <span class="floater floater--2 floater--pole">${poleArt()}</span>
+    <span class="floater floater--3">${dryerArt()}</span>
+    <span class="floater floater--4">${dropsArt()}</span>
+    <span class="floater floater--5">${combArt()}</span>
+    <span class="floater floater--6">${sparklesArt()}</span>
+  </div>
   <div class="container hero__grid">
     <div class="hero__copy">
       <p class="hero__badge" data-hero-item>${
@@ -88,6 +112,10 @@ function hero(site) {
         <span class="hero__line" data-hero-item>Sit down<span class="hero__dot">.</span></span>
         <span class="hero__line hero__line--accent" data-hero-item>Look sharp<span class="hero__dot">.</span></span>
       </h1>
+      <div class="cutline" data-hero-item aria-hidden="true">
+        <span class="cutline__done"></span>
+        <span class="cutline__scissors">${scissorsArt()}</span>
+      </div>
       <p class="hero__lead" data-hero-item>Men’s and women’s haircuts, styling, color and facial waxing — no appointment needed.${
         b.foundedYear ? ` ${b.city}’s barbershop and full service salon since ${b.foundedYear}.` : ''
       }</p>
@@ -127,10 +155,12 @@ function ticker(site) {
     ...(b.foundedYear ? [`Since ${b.foundedYear}`] : []),
     ...(b.building ? [`Inside ${b.building}`] : []),
   ];
-  const list = html`<ul class="ticker__list">${items.map((t) => html`<li>${t}</li>`)}</ul>`;
+  const ribbon = ['Barbershop', 'Salon', 'Walk in anytime', 'Book online', `Call ${b.phone}`, ...(b.foundedYear ? [`Since ${b.foundedYear}`] : [])];
+  const list = (words) => html`<ul class="ticker__list">${words.map((t) => html`<li>${t}</li>`)}</ul>`;
   return html`
-<div class="ticker" aria-hidden="true">
-  <div class="ticker__track">${list}${list}</div>
+<div class="tickers" aria-hidden="true">
+  <div class="ticker ticker--ribbon"><div class="ticker__track">${list(ribbon)}${list(ribbon)}</div></div>
+  <div class="ticker"><div class="ticker__track">${list(items)}${list(items)}</div></div>
 </div>`;
 }
 
@@ -171,7 +201,7 @@ function about(site) {
       <figure class="about__main">
         <img src="/images/about-main-900.webp" srcset="/images/about-main-600.webp 600w, /images/about-main-900.webp 900w"
           sizes="(min-width: 960px) 40vw, 90vw" width="900" height="1125" loading="lazy" decoding="async"
-          alt="Barber detailing a client's haircut">
+          alt="Barber in a hat styling a client’s fade">
       </figure>
       <figure class="about__detail" data-parallax-soft>
         <img src="/images/about-detail-600.webp" width="600" height="720" loading="lazy" decoding="async"
@@ -213,12 +243,13 @@ function about(site) {
 }
 
 function serviceCard(s) {
+  const look = serviceLook(s);
   const price = formatPrice(s.priceCents, s.priceFrom);
   const duration = formatDuration(s.durationMin);
   return html`
-<article class="service-card">
+<article class="service-card" data-tone="${look.tone}">
   <div class="service-card__top">
-    <span class="service-card__icon" aria-hidden="true">${icon(serviceIcon(s))}</span>
+    <span class="service-card__icon" aria-hidden="true">${serviceArt(look.art)}</span>
     ${price ? html`<span class="service-card__price">${price}</span>` : ''}
   </div>
   <h4 class="service-card__name">${s.name}</h4>
@@ -245,7 +276,10 @@ function side(key, items, i) {
     <span class="side__num" aria-hidden="true">0${i + 1}</span>
   </figure>
   <div class="side__body">
-    <h3 class="side__title" id="side-${key}-title">${s.title}</h3>
+    <div class="side__head">
+      <h3 class="side__title" id="side-${key}-title">${s.title}</h3>
+      <div class="side__art" aria-hidden="true">${key === 'salon' ? html`${dryerArt()}${dropsArt()}` : html`${poleArt()}${scissorsArt()}`}</div>
+    </div>
     <p class="side__text">${s.text}</p>
     <ul class="side__points">${s.points.map((p) => html`<li>${icon('check')}<span>${raw(p)}</span></li>`)}</ul>
     <div class="side__list">${items.map((svc) => serviceCard(svc))}</div>
@@ -283,6 +317,7 @@ function ctaBand(site) {
 <section class="section cta-band" id="book-cta" aria-labelledby="cta-title">
   <div class="container">
     <div class="cta-band__panel" data-reveal>
+      ${bgPhoto('cta')}
       <div class="cta-band__content">
         <p class="eyebrow eyebrow--on-accent">Book ahead</p>
         <h2 class="cta-band__title" id="cta-title">Skip the wait. Book ahead.</h2>
@@ -336,6 +371,7 @@ function reviews(site) {
       </div>`;
   return html`
 <section class="section section--soft reviews" id="reviews" aria-labelledby="reviews-title">
+  ${bgPhoto('reviews')}
   <div class="container">
     <header class="section-head section-head--center">
       <p class="eyebrow" data-reveal>Reviews</p>

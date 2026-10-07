@@ -131,6 +131,7 @@ if ('IntersectionObserver' in window && !reduceMotion) {
 
 const heroMedia = $('[data-parallax]');
 const softItems = $$('[data-parallax-soft]');
+const bgPhotos = $$('[data-parallax-bg]');
 const parallaxOn = !reduceMotion && window.matchMedia('(pointer: fine) and (min-width: 900px)').matches;
 
 function updateParallax() {
@@ -143,6 +144,43 @@ function updateParallax() {
     if (rect.bottom < -100 || rect.top > vh + 100) continue;
     const offset = (rect.top + rect.height / 2 - vh / 2) * -0.06;
     node.style.transform = `translate3d(0, ${offset.toFixed(1)}px, 0)`;
+  }
+  // Background photos drift up to 10% of their height (the image is 24% taller than its frame).
+  for (const node of bgPhotos) {
+    const rect = node.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > vh) continue;
+    const progress = Math.max(-1, Math.min(1, (rect.top + rect.height / 2 - vh / 2) / vh));
+    node.firstElementChild.style.transform = `translate3d(0, ${(progress * rect.height * 0.1).toFixed(1)}px, 0)`;
+  }
+}
+
+/* Side panels: a soft colour spotlight follows the pointer. */
+if (parallaxOn) {
+  for (const panel of $$('.side')) {
+    panel.addEventListener('pointermove', (e) => {
+      const r = panel.getBoundingClientRect();
+      panel.style.setProperty('--mx', `${(e.clientX - r.left).toFixed(0)}px`);
+      panel.style.setProperty('--my', `${(e.clientY - r.top).toFixed(0)}px`);
+    });
+  }
+}
+
+/* Hero doors tilt gently toward the pointer, with a soft glare. */
+if (parallaxOn) {
+  for (const card of $$('.hero-side')) {
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.setProperty('--rx', `${(-y * 8).toFixed(2)}deg`);
+      card.style.setProperty('--ry', `${(x * 10).toFixed(2)}deg`);
+      card.style.setProperty('--gx', `${((x + 0.5) * 100).toFixed(1)}%`);
+      card.style.setProperty('--gy', `${((y + 0.5) * 100).toFixed(1)}%`);
+    });
+    card.addEventListener('pointerleave', () => {
+      card.style.removeProperty('--rx');
+      card.style.removeProperty('--ry');
+    });
   }
 }
 

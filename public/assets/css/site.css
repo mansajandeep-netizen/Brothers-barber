@@ -21,7 +21,23 @@
   --accent-soft-2: #d6e0ff;
   --grad: linear-gradient(120deg, #2f5bff 0%, #4f46e5 100%);
   --grad-hover: linear-gradient(120deg, #1e46e6 0%, #4338ca 100%);
-  --grad-text: linear-gradient(95deg, #2f5bff 0%, #6a4cff 100%);
+  --grad-text: linear-gradient(95deg, #2f5bff 0%, #7c4dff 50%, #e0307f 100%);
+  --grad-rainbow: linear-gradient(90deg, #2f5bff, #7c4dff, #ff3d8b, #ff6b4a, #10c7a1);
+  --grad-ribbon: linear-gradient(100deg, #2f5bff 0%, #6a4cff 55%, #8b3dff 100%);
+
+  /* Extra colours: one per service, each with a soft tint and a readable "ink". */
+  --c-pink: #ff3d8b;
+  --c-pink-soft: #ffe6f0;
+  --c-pink-ink: #b8145a;
+  --c-violet: #7c4dff;
+  --c-violet-soft: #f0ebff;
+  --c-violet-ink: #5a33e5;
+  --c-coral: #ff6b4a;
+  --c-coral-soft: #ffece6;
+  --c-coral-ink: #b83a1c;
+  --c-mint: #10c7a1;
+  --c-mint-soft: #dcf8f1;
+  --c-mint-ink: #0a7a63;
 
   --success: #15803d;
   --success-ink: #166534;
@@ -622,7 +638,7 @@ main:focus {
       position: absolute;
       inset: 0 0 auto;
       height: 3px;
-      background: var(--grad-text);
+      background: var(--grad-rainbow);
       transform: scaleX(0);
       transform-origin: 0 50%;
       animation: scroll-progress linear both;
@@ -949,16 +965,109 @@ main:focus {
   background: radial-gradient(circle, rgba(106, 76, 255, 0.1), transparent 70%);
 }
 
-.hero::before {
-  content: '';
+/* Little animated tools floating around the hero. */
+.hero__floaters {
   position: absolute;
   inset: 0;
-  z-index: -2;
-  background-image: radial-gradient(rgba(17, 24, 39, 0.11) 1px, transparent 1.5px);
-  background-size: 24px 24px;
-  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 65% 25%, #000 15%, transparent 70%);
-  mask-image: radial-gradient(ellipse 75% 65% at 65% 25%, #000 15%, transparent 70%);
+  z-index: -1;
   pointer-events: none;
+}
+
+.floater {
+  --n: 0;
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  padding: 12px;
+  border: 1px solid rgba(17, 24, 39, 0.06);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow);
+  color: var(--accent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  animation:
+    pop-in 0.8s var(--ease-out) calc(var(--n) * 120ms + 700ms) both,
+    drift 9s ease-in-out infinite;
+}
+
+.floater--pole {
+  width: 40px;
+  height: 92px;
+  padding: 10px 11px;
+}
+
+.floater--1 {
+  --n: 1;
+  top: 21%;
+  left: 48%;
+  color: var(--c-pink);
+}
+
+.floater--2 {
+  --n: 2;
+  top: 50%;
+  left: 51%;
+  animation-duration: 0.8s, 11s;
+}
+
+.floater--3 {
+  --n: 3;
+  top: 12%;
+  right: 2.5%;
+  color: var(--c-violet);
+  animation-duration: 0.8s, 10s;
+}
+
+.floater--4 {
+  --n: 4;
+  right: 35%;
+  bottom: 5%;
+  color: var(--text-3);
+  animation-duration: 0.8s, 12s;
+}
+
+.floater--5 {
+  --n: 5;
+  top: 12%;
+  left: 37%;
+  color: var(--accent);
+  animation-duration: 0.8s, 13s;
+}
+
+.floater--6 {
+  --n: 6;
+  top: 56%;
+  right: 1.5%;
+  color: var(--c-mint);
+  animation-duration: 0.8s, 8s;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: -7deg;
+  }
+  50% {
+    translate: 0 -16px;
+    rotate: 7deg;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+
+@media (max-width: 959px) {
+  .hero__floaters {
+    display: none;
+  }
 }
 
 .hero__grid {
@@ -1107,9 +1216,25 @@ main:focus {
   box-shadow: var(--shadow-lg);
   color: #fff;
   text-decoration: none;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transition:
     transform 0.5s var(--ease-out),
     box-shadow 0.5s var(--ease-out);
+}
+
+.hero-side::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(255, 255, 255, 0.3), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.hero-side:hover::before {
+  opacity: 1;
 }
 
 .hero-side--barbershop {
@@ -1141,8 +1266,11 @@ main:focus {
 }
 
 .hero-side:hover {
-  transform: translateY(-6px);
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-6px);
   box-shadow: 0 40px 70px -30px rgba(79, 70, 229, 0.45);
+  transition:
+    transform 0.2s ease-out,
+    box-shadow 0.5s var(--ease-out);
 }
 
 .hero-side:hover img {
@@ -1256,6 +1384,36 @@ main:focus {
   from {
     opacity: 0;
     transform: translateY(24px);
+  }
+}
+
+.hero__line {
+  animation-name: line-in;
+  animation-duration: 1s;
+}
+
+@keyframes line-in {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(0.45em);
+  }
+  to {
+    clip-path: inset(-0.3em -0.3em -0.3em -0.3em);
+    transform: none;
+  }
+}
+
+.hero__meta [data-open-status].is-open .icon {
+  animation: pulse-ring 2.2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.35);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 10px rgba(21, 128, 61, 0);
   }
 }
 
@@ -3162,6 +3320,45 @@ main:focus {
   filter: none;
 }
 
+.js .side[data-reveal] .side__media,
+.js .about__media[data-reveal] .about__main {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1.2s var(--ease-out) calc(var(--rd, 0ms) + 0.15s);
+}
+
+.js .side[data-reveal].is-visible .side__media,
+.js .about__media[data-reveal].is-visible .about__main {
+  clip-path: inset(-60px);
+}
+
+.js .side[data-reveal] .side__media img,
+.js .about__media[data-reveal] .about__main img {
+  scale: 1.15;
+  transition: scale 1.8s var(--ease-out) 0.1s;
+}
+
+.js .side[data-reveal].is-visible .side__media img,
+.js .about__media[data-reveal].is-visible .about__main img {
+  scale: 1;
+}
+
+.js .side[data-reveal].is-visible:hover .side__media img {
+  scale: 1.04;
+}
+
+.js .gallery__item[data-reveal] {
+  scale: 0.94;
+  transition:
+    opacity 0.8s var(--ease-out) var(--rd),
+    translate 0.9s var(--ease-out) var(--rd),
+    filter 0.9s var(--ease-out) var(--rd),
+    scale 1s var(--ease-out) var(--rd);
+}
+
+.js .gallery__item[data-reveal].is-visible {
+  scale: 1;
+}
+
 /* ---------- Booking dialog ---------- */
 
 .booking {
@@ -4308,6 +4505,84 @@ textarea.input {
   color: var(--danger-ink);
 }
 
+/* ---------- Background photos ---------- */
+
+.bg-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Taller than its frame so the scroll drift never shows an edge. */
+.bg-photo img {
+  position: absolute;
+  top: -12%;
+  left: 0;
+  width: 100%;
+  height: 124%;
+  object-fit: cover;
+}
+
+/* Hero: a bright, washed-out salon behind the headline, slowly zooming. */
+.bg-photo--hero img {
+  filter: saturate(0.85);
+  animation: kenburns 26s ease-in-out infinite alternate;
+}
+
+.bg-photo--hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 55%, #fff 98%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 45%, rgba(255, 255, 255, 0.66) 100%);
+}
+
+@media (max-width: 959px) {
+  .bg-photo--hero::after {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.93) 60%, #fff 100%);
+  }
+}
+
+@keyframes kenburns {
+  from {
+    scale: 1.04;
+  }
+  to {
+    scale: 1.14;
+    translate: -2% -1%;
+  }
+}
+
+/* Booking panel: the photo is multiplied into the blue, so text never gets lighter backing than plain blue. */
+.bg-photo--cta {
+  z-index: -2;
+  opacity: 0.55;
+  mix-blend-mode: multiply;
+}
+
+.bg-photo--cta img {
+  filter: grayscale(1) contrast(1.1);
+}
+
+/* Reviews: a faint photo behind the soft grey, faded at the edges. */
+.reviews {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.bg-photo--reviews {
+  opacity: 0.12;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 25%, #000 75%, transparent);
+}
+
+.bg-photo--reviews img {
+  filter: grayscale(1);
+}
+
 /* ---------- Ticker ---------- */
 
 .ticker {
@@ -4386,6 +4661,666 @@ textarea.input {
   text-align: center;
   white-space: nowrap;
   user-select: none;
+}
+
+/* ---------- Colour & motion layer ---------- */
+
+/* Accent words shimmer through the brand gradient. */
+.hero__line--accent,
+.section-title em {
+  background-size: 220% 100%;
+}
+
+.section-title em {
+  animation: shimmer 7s ease-in-out infinite alternate;
+}
+
+.hero__line--accent {
+  animation:
+    line-in 1s var(--ease-out) calc(var(--i, 0) * 90ms + 120ms) both,
+    shimmer 7s ease-in-out 1.4s infinite alternate;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+/* Soft colour blobs drifting behind the hero. */
+.aurora {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.aurora span {
+  position: absolute;
+  width: max(260px, 40vw);
+  max-width: 640px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0.32;
+  filter: blur(70px);
+  animation: aurora 18s ease-in-out infinite alternate;
+}
+
+.aurora span:nth-child(1) {
+  top: -14%;
+  right: 2%;
+  background: #ff7ab3;
+}
+
+.aurora span:nth-child(2) {
+  bottom: -20%;
+  left: -8%;
+  background: #5eead4;
+  animation-duration: 22s;
+  animation-delay: -6s;
+}
+
+.aurora span:nth-child(3) {
+  top: 24%;
+  left: 36%;
+  width: max(200px, 26vw);
+  background: #a78bfa;
+  opacity: 0.26;
+  animation-duration: 26s;
+  animation-delay: -12s;
+}
+
+@keyframes aurora {
+  0% {
+    translate: 0 0;
+    scale: 1;
+  }
+  50% {
+    translate: 6% 8%;
+    scale: 1.15;
+  }
+  100% {
+    translate: -6% -4%;
+    scale: 0.95;
+  }
+}
+
+/* "Cut here": scissors snip along a dashed line under the headline. */
+.cutline {
+  --i: 4;
+  position: relative;
+  max-width: 440px;
+  height: 30px;
+  margin: -0.4rem 0 1rem;
+}
+
+.cutline::before {
+  content: '';
+  position: absolute;
+  inset: 50% 0 auto;
+  border-top: 2px dashed var(--line-2);
+}
+
+.cutline__done {
+  position: absolute;
+  inset: calc(50% - 1.5px) 0 auto;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--grad-rainbow);
+  transform-origin: left;
+  scale: 0 1;
+  animation: cut-line 5s var(--ease) 1.3s infinite;
+}
+
+.cutline__scissors {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  color: var(--c-pink);
+  animation: cut-move 5s var(--ease) 1.3s infinite;
+}
+
+.cutline .art-scissors__a {
+  animation: snip-a-fast 0.45s ease-in-out infinite;
+}
+
+.cutline .art-scissors__b {
+  animation: snip-b-fast 0.45s ease-in-out infinite;
+}
+
+@keyframes cut-line {
+  0% {
+    scale: 0 1;
+    opacity: 1;
+  }
+  70%,
+  88% {
+    scale: 1 1;
+    opacity: 1;
+  }
+  100% {
+    scale: 1 1;
+    opacity: 0;
+  }
+}
+
+@keyframes cut-move {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  70% {
+    left: calc(100% - 32px);
+    opacity: 1;
+  }
+  85%,
+  100% {
+    left: calc(100% - 32px);
+    opacity: 0;
+  }
+}
+
+/* ----- Illustrations (server/views/art.js) ----- */
+
+.art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.art-scissors__a,
+.art-scissors__b {
+  transform-box: view-box;
+  transform-origin: 30px 32px;
+}
+
+.art-scissors__a {
+  animation: snip-a 2.4s ease-in-out infinite;
+}
+
+.art-scissors__b {
+  animation: snip-b 2.4s ease-in-out infinite;
+}
+
+@keyframes snip-a {
+  0%,
+  40%,
+  100% {
+    transform: rotate(-16deg);
+  }
+  10%,
+  30% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes snip-b {
+  0%,
+  40%,
+  100% {
+    transform: rotate(16deg);
+  }
+  10%,
+  30% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes snip-a-fast {
+  0%,
+  100% {
+    transform: rotate(-18deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes snip-b-fast {
+  0%,
+  100% {
+    transform: rotate(18deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+}
+
+.art-comb__body {
+  transform-box: view-box;
+  transform-origin: 32px 32px;
+  animation: comb 2.6s ease-in-out infinite;
+}
+
+@keyframes comb {
+  0%,
+  100% {
+    transform: translateX(-5px) rotate(-7deg);
+  }
+  50% {
+    transform: translateX(5px) rotate(5deg);
+  }
+}
+
+.art-dryer__body {
+  animation: buzz 0.18s linear infinite;
+}
+
+@keyframes buzz {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(0.5px, -0.4px);
+  }
+}
+
+.art-dryer__air path {
+  stroke-dasharray: 4 5;
+  animation: blow 0.6s linear infinite;
+}
+
+.art-dryer__air path:nth-child(2) {
+  animation-duration: 0.45s;
+}
+
+.art-dryer__air path:nth-child(3) {
+  animation-duration: 0.7s;
+}
+
+@keyframes blow {
+  from {
+    stroke-dashoffset: 18;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.art-drop {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: drip 2.4s ease-in infinite;
+}
+
+.art-drop--1 {
+  fill: var(--c-pink);
+}
+
+.art-drop--2 {
+  fill: var(--c-violet);
+  animation-delay: 0.8s;
+}
+
+.art-drop--3 {
+  fill: var(--c-mint);
+  animation-delay: 1.6s;
+}
+
+@keyframes drip {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.7);
+  }
+  15%,
+  55% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  85% {
+    opacity: 0;
+    transform: translateY(14px) scale(0.85);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.art-spark {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.art-spark--2 {
+  animation-delay: 0.6s;
+}
+
+.art-spark--3 {
+  animation-delay: 1.2s;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.55) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(25deg);
+  }
+}
+
+/* Barber pole: red, white and blue stripes climbing forever. */
+.art-pole {
+  position: relative;
+  width: 18px;
+  height: 100%;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 9px;
+  background: repeating-linear-gradient(-45deg, #ef4444 0 7px, #fff 7px 14px, #2f5bff 14px 21px, #fff 21px 28px);
+  background-size: 100% 39.6px;
+  box-shadow: inset 0 0 0 1.5px rgba(17, 24, 39, 0.12);
+  animation: pole 1.4s linear infinite;
+}
+
+.art-pole__glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.55), transparent 35%, transparent 65%, rgba(0, 0, 0, 0.14));
+}
+
+@keyframes pole {
+  to {
+    background-position: 0 39.6px;
+  }
+}
+
+/* ----- Services in colour ----- */
+
+[data-tone='blue'] {
+  --tone: var(--accent);
+  --tone-soft: var(--accent-soft);
+  --tone-ink: var(--accent-ink);
+}
+
+[data-tone='pink'] {
+  --tone: var(--c-pink);
+  --tone-soft: var(--c-pink-soft);
+  --tone-ink: var(--c-pink-ink);
+}
+
+[data-tone='violet'] {
+  --tone: var(--c-violet);
+  --tone-soft: var(--c-violet-soft);
+  --tone-ink: var(--c-violet-ink);
+}
+
+[data-tone='coral'] {
+  --tone: var(--c-coral);
+  --tone-soft: var(--c-coral-soft);
+  --tone-ink: var(--c-coral-ink);
+}
+
+[data-tone='mint'] {
+  --tone: var(--c-mint);
+  --tone-soft: var(--c-mint-soft);
+  --tone-ink: var(--c-mint-ink);
+}
+
+.service-card__icon .art {
+  width: 28px;
+  height: 28px;
+}
+
+.side .service-card[data-tone] .service-card__icon {
+  background: var(--tone-soft);
+  color: var(--tone);
+}
+
+.side .service-card[data-tone]:hover .service-card__icon {
+  background: var(--tone);
+  color: #fff;
+}
+
+.side .service-card[data-tone] .service-card__book {
+  background: var(--tone-soft);
+  color: var(--tone-ink);
+}
+
+.side .service-card[data-tone]:hover .service-card__book {
+  background: var(--tone-ink);
+  color: #fff;
+}
+
+.side .service-card[data-tone]:hover {
+  border-color: color-mix(in srgb, var(--tone) 35%, transparent);
+}
+
+.side__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.side__art {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.6rem;
+  height: 56px;
+  color: var(--side);
+}
+
+.side__art > .art {
+  width: 48px;
+  height: 48px;
+}
+
+.side__art > .art-pole {
+  width: 18px;
+  height: 54px;
+}
+
+/* A soft spotlight in the side's colour follows the pointer (site.js). */
+.side {
+  position: relative;
+  isolation: isolate;
+}
+
+.side::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(440px circle at var(--mx, 50%) var(--my, 0%), color-mix(in srgb, var(--side) 13%, transparent), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.side:hover::after {
+  opacity: 1;
+}
+
+.services {
+  background:
+    radial-gradient(40% 45% at 0% 0%, rgba(255, 61, 139, 0.08), transparent 70%),
+    radial-gradient(45% 50% at 100% 100%, rgba(16, 199, 161, 0.1), transparent 70%),
+    var(--bg-soft);
+}
+
+/* ----- Highlights in four colours ----- */
+
+.trust__item:nth-child(2) {
+  border-color: transparent;
+  background: var(--c-pink-soft);
+}
+
+.trust__item:nth-child(2) .trust__big {
+  color: var(--c-pink-ink);
+}
+
+.trust__item:nth-child(3) {
+  border-color: transparent;
+  background: var(--c-mint-soft);
+}
+
+.trust__item:nth-child(3) .trust__big {
+  color: var(--c-mint-ink);
+}
+
+.trust__item:nth-child(4) {
+  border-color: transparent;
+  background: var(--c-violet-soft);
+}
+
+.trust__item:nth-child(4) .trust__big {
+  color: var(--c-violet-ink);
+}
+
+/* ----- Section labels in different colours ----- */
+
+#about .eyebrow {
+  background: var(--c-pink-soft);
+  color: var(--c-pink-ink);
+}
+
+#gallery .eyebrow {
+  background: var(--c-mint-soft);
+  color: var(--c-mint-ink);
+}
+
+#reviews .eyebrow {
+  background: var(--c-violet-soft);
+  color: var(--c-violet-ink);
+}
+
+#location .eyebrow {
+  background: var(--c-coral-soft);
+  color: var(--c-coral-ink);
+}
+
+.chip.is-active {
+  border-color: transparent;
+  background: var(--grad) var(--accent);
+}
+
+/* ----- Crossing ribbons ----- */
+
+.tickers {
+  position: relative;
+  margin-bottom: clamp(16px, 3vw, 32px);
+  padding-block: 34px;
+  overflow: hidden;
+}
+
+.tickers .ticker {
+  position: relative;
+  z-index: 1;
+  margin: 0 -3%;
+  background: var(--surface);
+  box-shadow: 0 10px 30px -22px rgba(17, 24, 39, 0.35);
+  rotate: 1.2deg;
+}
+
+.tickers .ticker--ribbon {
+  position: absolute;
+  inset: 50% 0 auto;
+  z-index: 0;
+  border: 0;
+  background: var(--grad-ribbon);
+  color: #fff;
+  translate: 0 -50%;
+  rotate: -2.4deg;
+}
+
+.ticker--ribbon .ticker__track {
+  animation-direction: reverse;
+  animation-duration: 46s;
+}
+
+.ticker--ribbon .ticker__list li,
+.ticker--ribbon .ticker__list li:nth-child(even) {
+  color: #fff;
+}
+
+.ticker--ribbon .ticker__list li::after,
+.ticker--ribbon .ticker__list li:nth-child(n)::after {
+  background: #fff;
+}
+
+.ticker__list li:nth-child(4n + 1)::after {
+  background: var(--c-pink);
+}
+
+.ticker__list li:nth-child(4n + 2)::after {
+  background: var(--c-violet);
+}
+
+.ticker__list li:nth-child(4n + 3)::after {
+  background: var(--c-mint);
+}
+
+.ticker__list li:nth-child(4n)::after {
+  background: var(--accent);
+}
+
+/* ----- Booking panel: the three steps light up in turn ----- */
+
+.cta-band__steps li {
+  background: rgba(12, 18, 70, 0.24);
+}
+
+.cta-band__steps span {
+  animation: step-pop 4.5s ease-in-out infinite;
+}
+
+.cta-band__steps li:nth-child(2) span {
+  animation-delay: 1.5s;
+}
+
+.cta-band__steps li:nth-child(3) span {
+  animation-delay: 3s;
+}
+
+@keyframes step-pop {
+  0%,
+  30%,
+  100% {
+    scale: 1;
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+  12% {
+    scale: 1.2;
+    box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.25);
+  }
+}
+
+.reviews__quote {
+  animation: drift 7s ease-in-out infinite;
+}
+
+/* Footer wordmark in soft rainbow tints. */
+.site-footer__mark {
+  background: linear-gradient(90deg, #c7d4ff, #e2d6ff, #ffd0e3, #c9f3e8, #c7d4ff);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-mask-image: linear-gradient(180deg, #000 15%, transparent 95%);
+  mask-image: linear-gradient(180deg, #000 15%, transparent 95%);
+  animation: shimmer 12s linear infinite alternate;
 }
 
 /* ---------- Reduced motion ---------- */
